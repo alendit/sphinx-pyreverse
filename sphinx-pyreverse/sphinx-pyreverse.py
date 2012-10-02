@@ -11,12 +11,8 @@ from subprocess import call
 import os
 import shutil
 import tempfile
+from IPython import embed
 
-DIR_NAME = "uml_images"
-UML_DIR = os.path.abspath(DIR_NAME)
-print os.listdir(".")
-if os.path.basename(UML_DIR) not in os.listdir("."):
-    os.mkdir(UML_DIR)
 
 class UMLDiagramm(nodes.General, nodes.Element):
     pass
@@ -28,6 +24,11 @@ class UMLGenerateDirective(Directive):
     
     def run(self):
         env = self.state.document.settings.env
+        SRC_DIR = env.srcdir
+        DIR_NAME = "uml_images"
+        UML_DIR = os.path.join(SRC_DIR, DIR_NAME)
+        if os.path.basename(UML_DIR) not in os.listdir(SRC_DIR):
+            os.mkdir(UML_DIR)
         env.uml_dir = UML_DIR
         module_path = self.arguments[0]
         print "#" * 10
@@ -40,7 +41,7 @@ class UMLGenerateDirective(Directive):
         
         uri = directives.uri(os.path.join(DIR_NAME, "classes_{0}.png".format(basename)))
         print uri
-        img = nodes.image(uri=uri, scale="50")
+        img = nodes.image(uri=uri)
         os.chdir(old_dir)
         return [img]
 
@@ -54,15 +55,11 @@ def depart_uml_node(self, node):
 def process_uml_nodes():
     pass
 
-def clean_uml(app, exception):
-    shutil.rmtree(UML_DIR)
-    pass
-
-
 def setup(app):
     app.add_node(UMLDiagramm,
                  html=(visit_uml_node, depart_uml_node),
+                 latex=(visit_uml_node, depart_uml_node),
+                 text=(visit_uml_node, depart_uml_node),
                  )
 
     app.add_directive('uml', UMLGenerateDirective)
-    app.connect("build-finished", clean_uml)
