@@ -34,21 +34,5 @@ class UMLGenerateDirective(Directive):
         os.chdir(SRC_DIR)
         return [img]
 
-def visit_uml_node(self, node):
-    self.visit_image(node)
-
-def depart_uml_node(self, node):
-    self.depart_image(node)
-    
-    
-def process_uml_nodes():
-    pass
-
 def setup(app):
-    app.add_node(UMLDiagramm,
-                 html=(visit_uml_node, depart_uml_node),
-                 latex=(visit_uml_node, depart_uml_node),
-                 text=(visit_uml_node, depart_uml_node),
-                 )
-
     app.add_directive('uml', UMLGenerateDirective)
