@@ -6,18 +6,19 @@
 Welcome to test's documentation!
 ================================
 
-Contents:
+.. include::
+	../README.rst
 
 .. toctree::
    :maxdepth: 2
+   
+
+Example
+--------
+
+UML diagram of sphinx-pyreverse.py
 
 .. uml::
-	models.py
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+	../sphinx-pyreverse.py
+	
+	
