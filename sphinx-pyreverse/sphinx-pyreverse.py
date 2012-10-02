@@ -11,7 +11,6 @@ from subprocess import call
 import os
 import shutil
 import tempfile
-from IPython import embed
 
 
 class UMLDiagramm(nodes.General, nodes.Element):
