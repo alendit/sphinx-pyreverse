@@ -20,7 +20,7 @@ setup(name="sphinx-pyreverse",
       keywords="sphinx extension uml pyreverse",
       url="https://github.com/alendit/sphinx-pyreverse",
       long_description=read('README.rst'),
-      packages=['sphinx-pyreverse'],
+      packages=['sphinx_pyreverse'],
       classifiers=[
                    'Development Status :: 2 - Pre-Alpha',
                    'Intended Audience :: Information Technology',
