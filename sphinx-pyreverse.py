@@ -7,6 +7,7 @@ from docutils import nodes
 from sphinx.util.compat import Directive
 from sphinx.util.compat import make_admonition
 from subprocess import call
+import os
 
 class UMLDiagramm(nodes.General, nodes.Element):
     pass
@@ -15,9 +16,17 @@ class UMLGenerateDirective(Directive):
     has_content = True
     
     def run(self):
+        UML_DIR = "uml_images"
         module_path = self.content[0]
-        call(['pyreverse', '-o', 'png', '-p','output', "models.py"])
-        img = nodes.image(uri="classes_output.png", scale="50")
+        print "#" * 10
+        print module_path
+        if UML_DIR not in os.listdir("."):
+            os.mkdir(UML_DIR)
+        os.chdir(UML_DIR)
+        basename = os.path.basename(module_path).split(".")[0]
+        call(['pyreverse', '-o', 'png', '-p', basename, os.path.join("..", module_path)])
+        os.chdir("..")
+        img = nodes.image(uri=os.path.join(UML_DIR, "classes_{0}.png".format(basename)), scale="50")
         return [img]
 
 def visit_uml_node(self, node):
