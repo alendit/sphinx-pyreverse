@@ -9,7 +9,11 @@ from sphinx.util.compat import Directive
 from sphinx.util.compat import make_admonition
 from subprocess import call
 import os
-from PIL import Image
+
+try:
+    from PIL import Image
+except ImportError, e:
+    Image = None
 
 try:
     from IPython import embed
@@ -36,12 +40,13 @@ class UMLGenerateDirective(Directive):
         basename = os.path.basename(module_path).split(".")[0]
         print call(['pyreverse', '-o', 'png', '-p', basename, os.path.abspath(os.path.join(SRC_DIR, module_path))])
         uri = directives.uri(os.path.join(DIR_NAME, "classes_{0}.png".format(basename)))
-        i = Image.open(os.path.join(SRC_DIR, uri))
         scale = 100
         max_width = 1000
-        image_width = i.size[0]
-        if image_width > max_width:
-            scale = max_width * scale / image_width 
+        if Image:
+            i = Image.open(os.path.join(SRC_DIR, uri))
+            image_width = i.size[0]
+            if image_width > max_width:
+                scale = max_width * scale / image_width 
         img = nodes.image(uri=uri, scale=scale)
         os.chdir(SRC_DIR)
         return [img]
