@@ -28,7 +28,7 @@ class UMLGenerateDirective(Directive):
         module_path = self.arguments[0]
         os.chdir(UML_DIR)
         basename = os.path.basename(module_path).split(".")[0]
-        
+        print call(['pyreverse', '-o', 'png', '-p', basename, os.path.abspath(os.path.join(old_dir, module_path))])
         uri = directives.uri(os.path.join(DIR_NAME, "classes_{0}.png".format(basename)))
         img = nodes.image(uri=uri)
         os.chdir(SRC_DIR)
