@@ -13,7 +13,7 @@ Install with::
 Usage
 ------
 
-Add "sphinx-pyreverse" to your conf.py (make sure it is in the PYTHONPATH).
+Add "sphinx_pyreverse" to your conf.py (make sure it is in the PYTHONPATH).
 
 Call the directive with path to python module as content::
 
