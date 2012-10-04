@@ -11,7 +11,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(name="sphinx-pyreverse",
-      version="0.0.9",
+      version="0.0.10",
       author="Dimitri Vorona",
       author_email="vorona@in.tum.de",
       description=("A simple sphinx extension to generate "
