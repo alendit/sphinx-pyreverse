@@ -8,7 +8,7 @@ Install
 
 Install with::
 
-	pip install -e git+https://github.com/alendit/sphinx-pyreverse.git
+	pip install -e git+https://github.com/alendit/sphinx-pyreverse.git#egg=sphinx-pyreverse
 
 Usage
 ------
