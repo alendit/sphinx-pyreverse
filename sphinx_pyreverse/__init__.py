@@ -1,1 +1,1 @@
-import sphinx_pyreverse
+from sphinx_pyreverse import *
