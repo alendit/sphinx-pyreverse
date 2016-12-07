@@ -3,6 +3,9 @@ Created on Oct 1, 2012
 
 @author: alendit
 '''
+
+from __future__ import print_function
+
 from docutils import nodes
 from docutils.parsers.rst import directives
 from sphinx.util.compat import Directive
@@ -11,7 +14,7 @@ import os
 
 try:
     from PIL import Image as IMAGE
-except ImportError, error:
+except ImportError as error:
     IMAGE = None
 
 # debugging with IPython
@@ -39,8 +42,8 @@ class UMLGenerateDirective(Directive):
         module_path = self.arguments[0]
         os.chdir(uml_dir)
         basename = os.path.basename(module_path).split(".")[0]
-        print call(['pyreverse', '-o', 'png', '-p', basename,
-                    os.path.abspath(os.path.join(src_dir, module_path))])
+        print(call(['pyreverse', '-o', 'png', '-p', basename,
+                    os.path.abspath(os.path.join(src_dir, module_path))]))
         uri = directives.uri(os.path.join(self.DIR_NAME,
                                           "classes_{0}.png".format(basename)))
         scale = 100
