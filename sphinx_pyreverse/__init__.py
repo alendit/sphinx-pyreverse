@@ -30,12 +30,15 @@ class UMLGenerateDirective(Directive):
     optional_arguments = 2
     has_content = False
     DIR_NAME = "uml_images"
+    # a list of modules which have been parsed by pyreverse
     generated_modules = []
 
     def run(self):
         doc = self.state.document
         env = doc.settings.env
+        # the top-level source directory
         self.base_dir = env.srcdir
+        # the directory of the file calling the directive
         self.src_dir = os.path.dirname(doc.current_source)
         self.uml_dir = os.path.abspath(os.path.join(self.base_dir, self.DIR_NAME))
 
@@ -47,6 +50,7 @@ class UMLGenerateDirective(Directive):
         
         if self.module_name not in self.generated_modules:
             print(call(['pyreverse', '-o', 'png', '-p', self.module_name, self.module_name], cwd=self.uml_dir))
+            # avoid double-generating
             self.generated_modules.append(self.module_name)
         
         valid_flags = {':classes:', ':packages:'}
@@ -62,6 +66,7 @@ class UMLGenerateDirective(Directive):
 
     def generate_img(self, img_name):
         path_from_base = os.path.join(self.DIR_NAME, "{1}_{0}.png").format(self.module_name, img_name)
+        # relpath is necessary to allow generating from a sub-directory of the main 'source'
         uri = directives.uri(os.path.join(
             os.path.relpath(self.base_dir, start=self.src_dir), 
             path_from_base
