@@ -21,6 +21,7 @@ setup(name="sphinx-pyreverse",
       url="https://github.com/alendit/sphinx-pyreverse",
       long_description=read('README.rst'),
       packages=['sphinx_pyreverse'],
+      install_requires=['sphinx', 'docutils'],
       classifiers=[
                    'Development Status :: 2 - Pre-Alpha',
                    'Intended Audience :: Information Technology',
