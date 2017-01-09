@@ -18,5 +18,5 @@ Example
 
 UML diagram of sphinx-pyreverse.py
 
-.. uml:: ../sphinx_pyreverse/sphinx_pyreverse.py
+.. uml:: sphinx_pyreverse
 	
