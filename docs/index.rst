@@ -19,4 +19,5 @@ Example
 UML diagram of sphinx-pyreverse.py
 
 .. uml:: sphinx_pyreverse
+   :classes:
 	
