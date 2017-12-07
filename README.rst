@@ -21,4 +21,8 @@ Call the directive with path to python module as content. The ``:classes:`` and 
         :classes:
         :namespaces:
     
+Ohter available flags from pyreverse::
+	* show-ancestors
+	* show-associated
+	
 Requires pyreverse from pylint.
