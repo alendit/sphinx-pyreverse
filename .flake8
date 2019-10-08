@@ -1,0 +1,15 @@
+[flake8]
+
+# E203 is not a pep8 standard warning
+# [idx : endidx] <- compliant
+# [idx: endidx] <- E203's version
+ignore = E203
+
+# match python-black 80 + 10%, causes much shorter files
+max-line-length = 88
+
+# McCabe complexity
+max-complexity = 10
+
+# Enable flake8-bugbear
+select = C,E,F,W,B,B9

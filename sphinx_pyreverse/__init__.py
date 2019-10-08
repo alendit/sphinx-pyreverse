@@ -18,7 +18,7 @@ import os
 
 try:
     from PIL import Image as IMAGE
-except ImportError as error:
+except ImportError as error: #pragma: no cover
     IMAGE = None
 
 # debugging with IPython
