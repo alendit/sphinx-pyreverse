@@ -85,6 +85,12 @@ class TestUMLGenerateDirective(unittest.TestCase):
             self.assertTrue(os.path.exists(tempdir.path))
             self.assertFalse(os.path.exists(mock_dir))
             try:
+                FileNotFoundError  # noqa: F823
+            except NameError:
+                # In python2 we need to define this built-in, but must ignore it on
+                # python3's flake8
+                FileNotFoundError = OSError  # noqa: F823
+            try:
                 instance.run()
                 self.assertTrue(False, "sphinx_pyreverse should not call mdkir -p")
             except FileNotFoundError:
