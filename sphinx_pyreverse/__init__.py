@@ -8,7 +8,10 @@ from __future__ import print_function
 
 from docutils import nodes
 from docutils.parsers.rst import directives
-from sphinx.util.compat import Directive
+try:
+    from sphinx.util.compat import Directive
+except ImportError:
+    from docutils.parsers.rst import Directive
 from subprocess import call
 import os
 
@@ -47,16 +50,18 @@ class UMLGenerateDirective(Directive):
 
         env.uml_dir = self.uml_dir
         self.module_name = self.arguments[0]
-        
+
         if self.module_name not in self.generated_modules:
             print(call(['pyreverse', '-o', 'png', '-p', self.module_name, self.module_name], cwd=self.uml_dir))
             # avoid double-generating
             self.generated_modules.append(self.module_name)
-        
+
         valid_flags = {':classes:', ':packages:'}
-        if not set(self.arguments[1:]).issubset(valid_flags):
-            raise ValueError('invalid flag encountered. must be one of {0}'.format(valid_flags))
-        
+        unkown_arguments = set(self.arguments[1:]) - valid_flags
+        if unkown_arguments:
+            raise ValueError('invalid flags encountered: {0}. Must be one of {1}' \
+                             .format(unkown_arguments, valid_flags))
+
         res = []
         for arg in self.arguments[1:]:
             img_name = arg.strip(':')
@@ -68,7 +73,7 @@ class UMLGenerateDirective(Directive):
         path_from_base = os.path.join(self.DIR_NAME, "{1}_{0}.png").format(self.module_name, img_name)
         # relpath is necessary to allow generating from a sub-directory of the main 'source'
         uri = directives.uri(os.path.join(
-            os.path.relpath(self.base_dir, start=self.src_dir), 
+            os.path.relpath(self.base_dir, start=self.src_dir),
             path_from_base
         ))
         scale = 100
