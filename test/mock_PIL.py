@@ -16,8 +16,10 @@ sys.modules[PIL_MODULE_NAME] = PIL_MOCK
 
 def _open(_):
     """ returns a dummy image with a size paramter """
+
     class MockImage:
         """ A MockImage with a mock size """
+
         def __init__(self):
             self.size = [0, 0]
 

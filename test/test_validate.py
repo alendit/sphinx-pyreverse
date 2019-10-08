@@ -19,6 +19,7 @@ from mock import Mock
 
 class TempdirGuard(object):
     """ creates and deletes a tmp-dir compatible with python2 and 3 """
+
     def __init__(self):
         self.path = tempfile.mkdtemp(prefix="sphinx_pyreverse_test")
 
@@ -32,6 +33,7 @@ class TempdirGuard(object):
 class TestUMLGenerateDirective(unittest.TestCase):
     def gen(self):
         """ Constructs and returns a mocked UMLGenerateDirectiver instance """
+
         class MockEnv:
             def __init__(self):
                 self.srcdir = "."
