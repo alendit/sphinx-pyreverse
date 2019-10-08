@@ -38,6 +38,17 @@ class UMLGenerateDirective(Directive):
     # a list of modules which have been parsed by pyreverse
     generated_modules = []
 
+    def _validate(self):
+        """ Validates that the RST parameters are valid """
+        valid_flags = {":classes:", ":packages:"}
+        unkown_arguments = set(self.arguments[1:]) - valid_flags
+        if unkown_arguments:
+            raise ValueError(
+                "invalid flags encountered: {0}. Must be one of {1}".format(
+                    unkown_arguments, valid_flags
+                )
+            )
+
     def run(self):
         doc = self.state.document
         env = doc.settings.env
@@ -53,6 +64,8 @@ class UMLGenerateDirective(Directive):
         env.uml_dir = uml_dir
         module_name = self.arguments[0]
 
+        self._validate()
+
         if module_name not in self.generated_modules:
             print(
                 call(
@@ -62,15 +75,6 @@ class UMLGenerateDirective(Directive):
             )
             # avoid double-generating
             self.generated_modules.append(module_name)
-
-        valid_flags = {":classes:", ":packages:"}
-        unkown_arguments = set(self.arguments[1:]) - valid_flags
-        if unkown_arguments:
-            raise ValueError(
-                "invalid flags encountered: {0}. Must be one of {1}".format(
-                    unkown_arguments, valid_flags
-                )
-            )
 
         res = []
         for arg in self.arguments[1:]:
