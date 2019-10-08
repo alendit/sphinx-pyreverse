@@ -97,7 +97,6 @@ class TestUMLGenerateDirective(unittest.TestCase):
             except FileNotFoundError:
                 pass  # aok
             self.assertFalse(os.path.exists(mock_dir))
-            self.assertFalse(os.path.exists(instance.uml_dir))
             os.mkdir(mock_dir)
             try:
                 instance.run()
@@ -106,7 +105,6 @@ class TestUMLGenerateDirective(unittest.TestCase):
                     "sphinx_pyreverse should have created a single directory"
                 )
             self.assertTrue(os.path.exists(mock_dir))
-            self.assertTrue(os.path.exists(instance.uml_dir))
 
     def test_generate_same_twice(self):
         """ check that there are no side-effects of processing the same module twice """
