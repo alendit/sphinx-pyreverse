@@ -41,7 +41,7 @@ if [ "$COVERAGE" != "100%" ]; then
 fi
 
 # Checks the syntax of all the files match the standards
-find . -iname "*.py" -print0 | xargs -0 python -m flake8
+find . -iname "*.py" -not -ipath "./*env/*" -print0 | xargs -0 python -m flake8
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ]; then
 	printf "FLAKE8: Failed\\n"
