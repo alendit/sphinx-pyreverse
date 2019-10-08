@@ -18,7 +18,7 @@ import os
 
 try:
     from PIL import Image as IMAGE
-except ImportError as error: #pragma: no cover
+except ImportError:  # pragma: no cover
     IMAGE = None
 
 # debugging with IPython
@@ -90,12 +90,9 @@ class UMLGenerateDirective(Directive):
         path_from_base = os.path.join(self.DIR_NAME, "{1}_{0}.png").format(
             self.module_name, img_name
         )
-        # relpath is necessary to allow generating from a sub-directory of the main 'source'
-        uri = directives.uri(
-            os.path.join(
-                os.path.relpath(self.base_dir, start=self.src_dir), path_from_base
-            )
-        )
+        # use relpath to get sub-directory of the main 'source' location
+        src_base = os.path.relpath(self.base_dir, start=self.src_dir)
+        uri = directives.uri(os.path.join(src_base, path_from_base))
         scale = 100
         max_width = 1000
         if IMAGE:

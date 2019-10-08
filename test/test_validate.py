@@ -19,6 +19,7 @@ from mock import Mock
 
 class TempdirGuard(object):
     """ creates and deletes a tmp-dir compatible with python2 and 3 """
+
     def __init__(self):
         self.path = tempfile.mkdtemp(prefix="sphinx_pyreverse_test")
 
@@ -32,6 +33,7 @@ class TempdirGuard(object):
 class TestUMLGenerateDirective(unittest.TestCase):
     def gen(self):
         """ Constructs and returns a mocked UMLGenerateDirectiver instance """
+
         class MockEnv:
             def __init__(self):
                 self.srcdir = "."
@@ -82,6 +84,12 @@ class TestUMLGenerateDirective(unittest.TestCase):
             instance.state.document.settings.env.srcdir = mock_dir
             self.assertTrue(os.path.exists(tempdir.path))
             self.assertFalse(os.path.exists(mock_dir))
+            try:
+                FileNotFoundError  # noqa: F823
+            except NameError:
+                # In python2 we need to define this built-in, but must ignore it on
+                # python3's flake8
+                FileNotFoundError = OSError  # noqa: F823
             try:
                 instance.run()
                 self.assertTrue(False, "sphinx_pyreverse should not call mdkir -p")
