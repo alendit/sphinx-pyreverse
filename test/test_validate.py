@@ -138,6 +138,7 @@ class TestUMLGenerateDirective(unittest.TestCase):
             def open_too_wide_image(_):
                 class MockImage():
                     """ Mocks an image with size params """
+
                     def __init__(self):
                         self.size = [width_under_test, 0]
 

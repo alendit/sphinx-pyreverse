@@ -6,15 +6,16 @@ Created on Oct 1, 2012
 
 from __future__ import print_function
 
+import os
+from subprocess import call
+
 from docutils import nodes
 from docutils.parsers.rst import directives
 
 try:
     from sphinx.util.compat import Directive
 except ImportError:
-    from docutils.parsers.rst import Directive
-from subprocess import call
-import os
+    from docutils.parsers.rst import Directive  # pylint: disable=C0412
 
 try:
     from PIL import Image as IMAGE
