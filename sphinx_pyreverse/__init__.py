@@ -1,13 +1,14 @@
-'''
+"""
 Created on Oct 1, 2012
 
 @author: alendit
-'''
+"""
 
 from __future__ import print_function
 
 from docutils import nodes
 from docutils.parsers.rst import directives
+
 try:
     from sphinx.util.compat import Directive
 except ImportError:
@@ -21,14 +22,15 @@ except ImportError as error:
     IMAGE = None
 
 # debugging with IPython
-#~ try:
-    #~ from IPython import embed
-#~ except ImportError as e:
-    #~ pass
+# ~ try:
+# ~ from IPython import embed
+# ~ except ImportError as e:
+# ~ pass
 
 
 class UMLGenerateDirective(Directive):
     """UML directive to generate a pyreverse diagram"""
+
     required_arguments = 1
     optional_arguments = 2
     has_content = False
@@ -52,30 +54,48 @@ class UMLGenerateDirective(Directive):
         self.module_name = self.arguments[0]
 
         if self.module_name not in self.generated_modules:
-            print(call(['pyreverse', '-o', 'png', '-p', self.module_name, self.module_name], cwd=self.uml_dir))
+            print(
+                call(
+                    [
+                        "pyreverse",
+                        "-o",
+                        "png",
+                        "-p",
+                        self.module_name,
+                        self.module_name,
+                    ],
+                    cwd=self.uml_dir,
+                )
+            )
             # avoid double-generating
             self.generated_modules.append(self.module_name)
 
-        valid_flags = {':classes:', ':packages:'}
+        valid_flags = {":classes:", ":packages:"}
         unkown_arguments = set(self.arguments[1:]) - valid_flags
         if unkown_arguments:
-            raise ValueError('invalid flags encountered: {0}. Must be one of {1}' \
-                             .format(unkown_arguments, valid_flags))
+            raise ValueError(
+                "invalid flags encountered: {0}. Must be one of {1}".format(
+                    unkown_arguments, valid_flags
+                )
+            )
 
         res = []
         for arg in self.arguments[1:]:
-            img_name = arg.strip(':')
+            img_name = arg.strip(":")
             res.append(self.generate_img(img_name))
 
         return res
 
     def generate_img(self, img_name):
-        path_from_base = os.path.join(self.DIR_NAME, "{1}_{0}.png").format(self.module_name, img_name)
+        path_from_base = os.path.join(self.DIR_NAME, "{1}_{0}.png").format(
+            self.module_name, img_name
+        )
         # relpath is necessary to allow generating from a sub-directory of the main 'source'
-        uri = directives.uri(os.path.join(
-            os.path.relpath(self.base_dir, start=self.src_dir),
-            path_from_base
-        ))
+        uri = directives.uri(
+            os.path.join(
+                os.path.relpath(self.base_dir, start=self.src_dir), path_from_base
+            )
+        )
         scale = 100
         max_width = 1000
         if IMAGE:
@@ -85,6 +105,7 @@ class UMLGenerateDirective(Directive):
                 scale = max_width * scale / image_width
         return nodes.image(uri=uri, scale=scale)
 
+
 def setup(app):
     """Setup directive"""
-    app.add_directive('uml', UMLGenerateDirective)
+    app.add_directive("uml", UMLGenerateDirective)
