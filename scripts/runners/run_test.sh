@@ -47,3 +47,11 @@ if [ $EXIT_CODE -ne 0 ]; then
 	printf "FLAKE8: Failed\\n"
 	exit $EXIT_CODE
 fi
+
+# Checks the syntax of all the files match the standards
+find sphinx_pyreverse -iname "*.py" -not -ipath "./*env/*" -print0 | xargs -0 python -m pylint -E
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+	printf "pylint: Failed\\n"
+	exit $EXIT_CODE
+fi

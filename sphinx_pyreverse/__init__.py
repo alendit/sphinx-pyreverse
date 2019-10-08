@@ -6,15 +6,16 @@ Created on Oct 1, 2012
 
 from __future__ import print_function
 
+import os
+from subprocess import call
+
 from docutils import nodes
 from docutils.parsers.rst import directives
 
 try:
     from sphinx.util.compat import Directive
 except ImportError:
-    from docutils.parsers.rst import Directive
-from subprocess import call
-import os
+    from docutils.parsers.rst import Directive  # pylint: disable=C0412
 
 try:
     from PIL import Image as IMAGE
@@ -38,38 +39,8 @@ class UMLGenerateDirective(Directive):
     # a list of modules which have been parsed by pyreverse
     generated_modules = []
 
-    def run(self):
-        doc = self.state.document
-        env = doc.settings.env
-        # the top-level source directory
-        self.base_dir = env.srcdir
-        # the directory of the file calling the directive
-        self.src_dir = os.path.dirname(doc.current_source)
-        self.uml_dir = os.path.abspath(os.path.join(self.base_dir, self.DIR_NAME))
-
-        if not os.path.exists(self.uml_dir):
-            os.mkdir(self.uml_dir)
-
-        env.uml_dir = self.uml_dir
-        self.module_name = self.arguments[0]
-
-        if self.module_name not in self.generated_modules:
-            print(
-                call(
-                    [
-                        "pyreverse",
-                        "-o",
-                        "png",
-                        "-p",
-                        self.module_name,
-                        self.module_name,
-                    ],
-                    cwd=self.uml_dir,
-                )
-            )
-            # avoid double-generating
-            self.generated_modules.append(self.module_name)
-
+    def _validate(self):
+        """ Validates that the RST parameters are valid """
         valid_flags = {":classes:", ":packages:"}
         unkown_arguments = set(self.arguments[1:]) - valid_flags
         if unkown_arguments:
@@ -79,24 +50,52 @@ class UMLGenerateDirective(Directive):
                 )
             )
 
+    def run(self):
+        doc = self.state.document
+        env = doc.settings.env
+        # the top-level source directory
+        base_dir = env.srcdir
+        # the directory of the file calling the directive
+        src_dir = os.path.dirname(doc.current_source)
+        uml_dir = os.path.abspath(os.path.join(base_dir, self.DIR_NAME))
+
+        if not os.path.exists(uml_dir):
+            os.mkdir(uml_dir)
+
+        env.uml_dir = uml_dir
+        module_name = self.arguments[0]
+
+        self._validate()
+
+        if module_name not in self.generated_modules:
+            print(
+                call(
+                    ["pyreverse", "-o", "png", "-p", module_name, module_name],
+                    cwd=uml_dir,
+                )
+            )
+            # avoid double-generating
+            self.generated_modules.append(module_name)
+
         res = []
         for arg in self.arguments[1:]:
             img_name = arg.strip(":")
-            res.append(self.generate_img(img_name))
+            res.append(self.generate_img(img_name, module_name, base_dir, src_dir))
 
         return res
 
-    def generate_img(self, img_name):
+    def generate_img(self, img_name, module_name, base_dir, src_dir):
+        """ Resizes the image and returns a Sphinx image """
         path_from_base = os.path.join(self.DIR_NAME, "{1}_{0}.png").format(
-            self.module_name, img_name
+            module_name, img_name
         )
         # use relpath to get sub-directory of the main 'source' location
-        src_base = os.path.relpath(self.base_dir, start=self.src_dir)
+        src_base = os.path.relpath(base_dir, start=src_dir)
         uri = directives.uri(os.path.join(src_base, path_from_base))
         scale = 100
         max_width = 1000
         if IMAGE:
-            i = IMAGE.open(os.path.join(self.base_dir, path_from_base))
+            i = IMAGE.open(os.path.join(base_dir, path_from_base))
             image_width = i.size[0]
             if image_width > max_width:
                 scale = max_width * scale / image_width

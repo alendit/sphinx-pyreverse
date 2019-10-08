@@ -4,12 +4,14 @@ Created on Oct 2, 2012
 
 @author: alendit
 """
-from setuptools import setup
 import os
+from setuptools import setup
 
 
 def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+    """ Reads a file in from disk """
+    with open(os.path.join(os.path.dirname(__file__), fname), "r") as file_handle:
+        return file_handle.read()
 
 
 setup(
