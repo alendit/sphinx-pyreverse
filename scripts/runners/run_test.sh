@@ -16,7 +16,7 @@ if [ -z "$NOSE2_EXE" ]; then
 fi
 
 # Runs the unit-tests and the code coverage at the same-time
-python3 -m coverage run --rcfile=.coveragerc "$NOSE2_EXE" --config unitest.cfg --fail-fast
+python -m coverage run --rcfile=.coveragerc "$NOSE2_EXE" --config unitest.cfg --fail-fast
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ]; then
 	exit $EXIT_CODE
@@ -41,7 +41,7 @@ if [ "$COVERAGE" != "100%" ]; then
 fi
 
 # Checks the syntax of all the files match the standards
-find . -iname "*.py" -print0 | xargs -0 python3 -m flake8
+find . -iname "*.py" -print0 | xargs -0 python -m flake8
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ]; then
 	printf "FLAKE8: Failed\\n"
