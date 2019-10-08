@@ -11,10 +11,9 @@ import shutil
 import tempfile
 
 import test.mock_subprocess
-import test.mock_PIL
-import sphinx_pyreverse
-
+import test.mock_pil
 from mock import Mock
+import sphinx_pyreverse
 
 
 class TempdirGuard(object):
@@ -31,6 +30,8 @@ class TempdirGuard(object):
 
 
 class TestUMLGenerateDirective(unittest.TestCase):
+    """ A collection of tests for the UMLGenerateDirective object """
+
     def gen(self):
         """ Constructs and returns a mocked UMLGenerateDirectiver instance """
 
@@ -92,7 +93,7 @@ class TestUMLGenerateDirective(unittest.TestCase):
                 FileNotFoundError = OSError  # noqa: F823
             try:
                 instance.run()
-                self.assertTrue(False, "sphinx_pyreverse should not call mdkir -p")
+                raise RuntimeError("sphinx_pyreverse should not call mdkir -p")
             except FileNotFoundError:
                 pass  # aok
             self.assertFalse(os.path.exists(mock_dir))
@@ -101,10 +102,9 @@ class TestUMLGenerateDirective(unittest.TestCase):
             try:
                 instance.run()
             except FileNotFoundError:
-                self.assertFalse(
-                    False, "sphinx_pyreverse should have created a single directory"
+                raise RuntimeError(
+                    "sphinx_pyreverse should have created a single directory"
                 )
-                raise
             self.assertTrue(os.path.exists(mock_dir))
             self.assertTrue(os.path.exists(instance.uml_dir))
 
@@ -122,8 +122,8 @@ class TestUMLGenerateDirective(unittest.TestCase):
         instance.arguments = ["module_name", ":bad_arg:"]
         try:
             instance.run()
-        except ValueError as e:
-            self.assertTrue("invalid flags encountered" in str(e))
+        except ValueError as exception:
+            self.assertTrue("invalid flags encountered" in str(exception))
 
     def test_valid_flags(self):
         """ ensure we accept the currently know valid-flags for pyreverse """
@@ -135,29 +135,33 @@ class TestUMLGenerateDirective(unittest.TestCase):
     def test_generate_img(self):
         """ cause UMLGenerateDirective.run() to call generate_image for all branches """
         instance = self.gen()
-        for width_under_test in (0, 1, 2000):
 
-            def open_too_wide_image(path):
-                class MockImage:
+        def scoped_test(width_under_test):
+            def open_too_wide_image(_):
+                class MockImage():
+                    """ Mocks an image with size params """
                     def __init__(self):
                         self.size = [width_under_test, 0]
 
                 return MockImage()
 
-            test.mock_PIL.PIL_MOCK.Image.open = open_too_wide_image
-            actual_width = test.mock_PIL.PIL_MOCK.Image.open("noexist").size[0]
+            test.mock_pil.PIL_MOCK.Image.open = open_too_wide_image  # noqa
+            actual_width = test.mock_pil.PIL_MOCK.Image.open("noexist").size[0]
             self.assertEqual(actual_width, width_under_test)
             instance.run()
 
-    def test_generate_img_no_PIL(self):
+        for width_under_test in (0, 1, 2000):
+            scoped_test(width_under_test)
+
+    def test_generate_img_no_pil(self):
         """ ensure we handle not have the PIL library gracefully
 
         The intent is to resize too-wide files """
         instance = self.gen()
-        oldImage = sphinx_pyreverse.IMAGE
+        old_image = sphinx_pyreverse.IMAGE
         sphinx_pyreverse.IMAGE = None
         instance.run()
-        sphinx_pyreverse.IMAGE = oldImage
+        sphinx_pyreverse.IMAGE = old_image
 
     def test_setup(self):
         """ simply calls the setup function, ensuring no errors """

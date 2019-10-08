@@ -87,6 +87,7 @@ class UMLGenerateDirective(Directive):
         return res
 
     def generate_img(self, img_name):
+        """ Resizes the image and returns a Sphinx image """
         path_from_base = os.path.join(self.DIR_NAME, "{1}_{0}.png").format(
             self.module_name, img_name
         )
