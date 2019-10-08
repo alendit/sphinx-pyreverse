@@ -1,0 +1,5 @@
+nose2
+coverage
+mock
+docutils
+flake8
