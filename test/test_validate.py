@@ -14,6 +14,7 @@ import test.mock_subprocess
 import test.mock_pil
 from mock import Mock
 import sphinx_pyreverse
+import sphinx_pyreverse.uml_generate_directive
 
 
 class TempdirGuard(object):
@@ -157,10 +158,10 @@ class TestUMLGenerateDirective(unittest.TestCase):
 
         The intent is to resize too-wide files """
         instance = self.gen()
-        old_image = sphinx_pyreverse.IMAGE
-        sphinx_pyreverse.IMAGE = None
+        old_image = sphinx_pyreverse.uml_generate_directive.IMAGE
+        sphinx_pyreverse.uml_generate_directive.IMAGE = None
         instance.run()
-        sphinx_pyreverse.IMAGE = old_image
+        sphinx_pyreverse.uml_generate_directive.IMAGE = old_image
 
     def test_setup(self):
         """ simply calls the setup function, ensuring no errors """

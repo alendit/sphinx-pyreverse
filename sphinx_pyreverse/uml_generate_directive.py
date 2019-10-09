@@ -1,10 +1,11 @@
 """
-Created on Oct 1, 2012
+Defines sphinx-wrappers for the pyreverse tool
 
-@author: alendit
+First, Created on Oct 1, 2012, this file created on Oct 8, 2019
+
+@author: alendit, doublethefish
 """
 
-from __future__ import print_function
 
 import os
 from subprocess import call
@@ -100,8 +101,3 @@ class UMLGenerateDirective(Directive):
             if image_width > max_width:
                 scale = max_width * scale / image_width
         return nodes.image(uri=uri, scale=scale)
-
-
-def setup(app):
-    """Setup directive"""
-    app.add_directive("uml", UMLGenerateDirective)
