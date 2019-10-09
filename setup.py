@@ -16,7 +16,7 @@ def read(fname):
 
 setup(
     name="sphinx-pyreverse",
-    version="0.0.10",
+    version="0.0.11a001",
     author="Dimitri Vorona",
     author_email="vorona@in.tum.de",
     description=(
