@@ -10,3 +10,5 @@ dist
 .ropeproject
 coverage/
 *env/
+dist_backups/
+dist/
