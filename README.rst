@@ -1,6 +1,8 @@
 Sphinx-pyreverse
 =================
 
+[![CircleCI](https://circleci.com/gh/alendit/sphinx-pyreverse.svg?style=svg)](https://circleci.com/gh/alendit/sphinx-pyreverse)
+
 A simple sphinx extension to generate a UML diagram from python modules.
 
 Install
@@ -22,5 +24,5 @@ Call the directive with path to python module as content. The ``:classes:`` and
     .. uml:: {{modulename}}
         :classes:
         :packages:
-    
+
 Requires pyreverse from pylint.
