@@ -5,6 +5,8 @@ Created on Oct 8, 2019
 
 @author: doublethefish
 """
+from contextlib import redirect_stdout
+import io
 import os
 import unittest
 import shutil
@@ -30,7 +32,43 @@ class TempdirGuard(object):
         shutil.rmtree(self.path)  # always clean up on exit
 
 
-class TestUMLGenerateDirective(unittest.TestCase):
+class TestUMLGenerateDirectiveBase(unittest.TestCase):
+    """ A collection of tests for the UMLGenerateDirective object """
+
+    def gen(self):
+        """ Constructs and returns a mocked UMLGenerateDirectiver instance """
+
+        class MockEnv:
+            def __init__(self):
+                self.srcdir = "."
+
+        class MockDocSettings:
+            def __init__(self):
+                self.env = MockEnv()
+
+        class MockDoc:
+            def __init__(self):
+                self.settings = MockDocSettings()
+                self.current_source = "."
+
+        class MockState:
+            def __init__(self):
+                self.document = MockDoc()
+
+        return sphinx_pyreverse.UMLGenerateDirective(
+            name="test",
+            arguments=["noexist_module", ":classes:", ":packages:"],
+            options=None,
+            content=None,
+            lineno=None,
+            content_offset=None,
+            block_text=None,
+            state=MockState(),
+            state_machine=None,
+        )
+
+
+class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
     """ A collection of tests for the UMLGenerateDirective object """
 
     def test_ctor(self):
@@ -139,3 +177,33 @@ class TestUMLGenerateDirective(unittest.TestCase):
     def test_setup(self):
         """ simply calls the setup function, ensuring no errors """
         self.assertEqual(sphinx_pyreverse.setup(Mock()), None)
+
+
+class TestLogFixture(TestUMLGenerateDirectiveBase):
+    def setUp(self):
+        self.bfunc, self.redirect_stdout = self.do_import()
+
+    def tearDown(self):
+        self.bfunc, self.redirect_stdout = self.do_import()
+
+    def do_import(self):
+        return io.StringIO, redirect_stdout
+
+    def test_pyreverse_fails(self):
+        def failing_call(_cmd, **args):
+            raise test.mock_subprocess.SUBPROCESS_MOCK.CalledProcessError()
+
+        instance = self.gen()
+        old_call = test.mock_subprocess.SUBPROCESS_MOCK.check_output
+        test.mock_subprocess.SUBPROCESS_MOCK.check_output = failing_call
+        with self.bfunc() as buf, self.redirect_stdout(buf):
+            caught = False
+            try:
+                instance.run()
+            except test.mock_subprocess.CalledProcessError as e:
+                self.assertEqual(buf.getvalue(), "dummy output\n")
+                self.assertEqual(e.output, "dummy output")
+                caught = True
+            finally:
+                test.mock_subprocess.SUBPROCESS_MOCK.check_output = old_call
+            self.assertTrue(caught, "Exception not raised inside mock sunprocess")
