@@ -33,38 +33,6 @@ class TempdirGuard(object):
 class TestUMLGenerateDirective(unittest.TestCase):
     """ A collection of tests for the UMLGenerateDirective object """
 
-    def gen(self):
-        """ Constructs and returns a mocked UMLGenerateDirectiver instance """
-
-        class MockEnv:
-            def __init__(self):
-                self.srcdir = "."
-
-        class MockDocSettings:
-            def __init__(self):
-                self.env = MockEnv()
-
-        class MockDoc:
-            def __init__(self):
-                self.settings = MockDocSettings()
-                self.current_source = "."
-
-        class MockState:
-            def __init__(self):
-                self.document = MockDoc()
-
-        return sphinx_pyreverse.UMLGenerateDirective(
-            name="test",
-            arguments=["noexist_module", ":classes:", ":packages:"],
-            options=None,
-            content=None,
-            lineno=None,
-            content_offset=None,
-            block_text=None,
-            state=MockState(),
-            state_machine=None,
-        )
-
     def test_ctor(self):
         """ simply constructs a UMLGenerateDirectiver instance with mock values """
         instance = self.gen()
