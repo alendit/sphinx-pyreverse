@@ -4,6 +4,9 @@ Sphinx-pyreverse
 .. image:: https://circleci.com/gh/alendit/sphinx-pyreverse.svg?style=svg
     :target: https://circleci.com/gh/alendit/sphinx-pyreverse
 
+.. image:: https://badge.fury.io/py/sphinx-pyreverse.svg
+    :target: https://badge.fury.io/py/sphinx-pyreverse
+
 A simple sphinx extension to generate a UML diagram from python modules.
 
 Install
