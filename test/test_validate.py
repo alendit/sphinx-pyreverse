@@ -164,23 +164,18 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         """ cause UMLGenerateDirective.run() to call generate_image for all branches """
         instance = self.gen()
 
-        def scoped_test(width_under_test):
-            def open_too_wide_image(_):
-                class MockImage:
-                    """ Mocks an image with size params """
+        def scoped_test(width_under_test, expected_scale):
+            with test.mock_pil.DimsUnderTestGuard(width=width_under_test):
+                mock_module = test.mock_pil.PIL_MOCK.Image  # pylint: disable=no-member
+                actual_width = mock_module.open("noexist").size[0]
+                self.assertEqual(actual_width, width_under_test)
+                res = instance.run()
+                self.assertEqual(
+                    res[0]["scale"], expected_scale, "Failed for %d" % width_under_test
+                )
 
-                    def __init__(self):
-                        self.size = [width_under_test, 0]
-
-                return MockImage()
-
-            test.mock_pil.PIL_MOCK.Image.open = open_too_wide_image  # noqa
-            actual_width = test.mock_pil.PIL_MOCK.Image.open("noexist").size[0]
-            self.assertEqual(actual_width, width_under_test)
-            instance.run()
-
-        for width_under_test in (0, 1, 2000):
-            scoped_test(width_under_test)
+        for width_under_test, expected_scale in ((0, 100), (1, 100), (2000, 50)):
+            scoped_test(width_under_test, expected_scale)
 
     def test_generate_img_no_pil(self):
         """ ensure we handle not have the PIL library gracefully
@@ -210,9 +205,9 @@ class TestLogFixture(TestUMLGenerateDirectiveBase):
     def test_pyreverse_fails(self):
         with test.mock_subprocess.FailExecuteGuard():
             self.assertEqual(test.mock_subprocess._CHECK_OUTPUT_FAILS, True)
-            test.mock_subprocess.SUBPROCESS_MOCK.check_output.side_effect = (
-                test.mock_subprocess.CalledProcessError()
-            )
+            mock_module = test.mock_subprocess.SUBPROCESS_MOCK
+            func_mock = mock_module.check_output  # pylint: disable=no-member
+            func_mock.side_effect = test.mock_subprocess.CalledProcessError()
 
             instance = self.gen()
 
