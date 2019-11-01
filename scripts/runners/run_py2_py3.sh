@@ -6,7 +6,7 @@ if [ ! -d sphinx_pyreverse ]; then
 	exit 3
 fi
 
-for python_version in "python2" "python3"; do
+for python_version in "python3" "python2"; do
   VENV_DIR="$python_version"_venv
   if [ ! -d "$VENV_DIR" ]; then
     virtualenv -p "$python_version" "$VENV_DIR"
