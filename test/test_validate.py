@@ -5,6 +5,26 @@ Created on Oct 8, 2019
 
 @author: doublethefish
 """
+try:
+    from contextlib import redirect_stdout
+    from io import StringIO
+except ImportError:
+    # It's likely we're in pyton2 instead of python3
+    import sys
+    import contextlib
+    from io import BytesIO as StringIO
+
+    @contextlib.contextmanager
+    def redirect_stdout(target):
+        oldio = (sys.stdout, sys.stderr)
+        sys.stdout = target
+        sys.stderr = target
+        try:
+            yield
+        finally:
+            sys.stdout, sys.stderr = oldio
+
+
 import os
 import unittest
 import shutil
@@ -30,7 +50,7 @@ class TempdirGuard(object):
         shutil.rmtree(self.path)  # always clean up on exit
 
 
-class TestUMLGenerateDirective(unittest.TestCase):
+class TestUMLGenerateDirectiveBase(unittest.TestCase):
     """ A collection of tests for the UMLGenerateDirective object """
 
     def gen(self):
@@ -65,6 +85,10 @@ class TestUMLGenerateDirective(unittest.TestCase):
             state_machine=None,
         )
 
+
+class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
+    """ A collection of tests for the UMLGenerateDirective object """
+
     def test_ctor(self):
         """ simply constructs a UMLGenerateDirectiver instance with mock values """
         instance = self.gen()
@@ -92,12 +116,17 @@ class TestUMLGenerateDirective(unittest.TestCase):
                 # In python2 we need to define this built-in, but must ignore it on
                 # python3's flake8
                 FileNotFoundError = OSError  # noqa: F823
-            try:
+
+            # Check that spinhx_pyreverse doesn't create all the directories.
+            with self.assertRaises(
+                FileNotFoundError, msg="sphinx_pyreverse should not call mdkir -p"
+            ):
                 instance.run()
-                raise RuntimeError("sphinx_pyreverse should not call mdkir -p")
-            except FileNotFoundError:
-                pass  # aok
+
             self.assertFalse(os.path.exists(mock_dir))
+
+            # Now make the parent dir, sphinx_pyreverse should create everything below
+            # that, to a single depth
             os.mkdir(mock_dir)
             try:
                 instance.run()
@@ -137,7 +166,7 @@ class TestUMLGenerateDirective(unittest.TestCase):
 
         def scoped_test(width_under_test):
             def open_too_wide_image(_):
-                class MockImage():
+                class MockImage:
                     """ Mocks an image with size params """
 
                     def __init__(self):
@@ -166,3 +195,33 @@ class TestUMLGenerateDirective(unittest.TestCase):
     def test_setup(self):
         """ simply calls the setup function, ensuring no errors """
         self.assertEqual(sphinx_pyreverse.setup(Mock()), None)
+
+
+class TestLogFixture(TestUMLGenerateDirectiveBase):
+    def setUp(self):
+        self.bfunc, self.redirect_stdout = self.do_import()
+
+    def tearDown(self):
+        self.bfunc, self.redirect_stdout = self.do_import()
+
+    def do_import(self):
+        return StringIO, redirect_stdout
+
+    def test_pyreverse_fails(self):
+        with test.mock_subprocess.FailExecuteGuard():
+            self.assertEqual(test.mock_subprocess._CHECK_OUTPUT_FAILS, True)
+            test.mock_subprocess.SUBPROCESS_MOCK.check_output.side_effect = (
+                test.mock_subprocess.CalledProcessError()
+            )
+
+            instance = self.gen()
+
+            with self.bfunc() as buf, self.redirect_stdout(buf):
+                with self.assertRaises(test.mock_subprocess.CalledProcessError):
+                    test.mock_subprocess.failing_call("")
+                self.assertEqual(buf.getvalue(), "")
+
+            with self.bfunc() as buf, self.redirect_stdout(buf):
+                with self.assertRaises(test.mock_subprocess.CalledProcessError):
+                    instance.run()
+                self.assertEqual(buf.getvalue(), "dummy output\n")

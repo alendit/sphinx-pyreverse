@@ -6,9 +6,8 @@ First, Created on Oct 1, 2012, this file created on Oct 8, 2019
 @author: alendit, doublethefish
 """
 
-
 import os
-from subprocess import call
+import subprocess
 
 from docutils import nodes
 from docutils.parsers.rst import directives
@@ -69,12 +68,14 @@ class UMLGenerateDirective(Directive):
         self._validate()
 
         if module_name not in self.generated_modules:
-            print(
-                call(
+            try:
+                subprocess.check_output(
                     ["pyreverse", "-o", "png", "-p", module_name, module_name],
                     cwd=uml_dir,
                 )
-            )
+            except subprocess.CalledProcessError as error:
+                print(error.output)
+                raise
             # avoid double-generating
             self.generated_modules.append(module_name)
 
