@@ -17,7 +17,7 @@ fi
 
 printf "Finding files to test "
 printf "with find...\\n"
-PYTHON_FILES=$(find "$(pwd)" -iname "*.py" -not -ipath "$(pwd)/*env/*" -print)
+PYTHON_FILES=$(find "$(pwd)" -iname "*.py" -not -ipath "$(pwd)/*env/*" -not -ipath "$(pwd)/build/*"  -not -ipath "$(pwd)/.rope*/*" -print)
 printf "    %s python files found/changed.\\n" "$(echo "$PYTHON_FILES" | wc -l)"
 
 # Runs the unit-tests and the code coverage at the same-time
