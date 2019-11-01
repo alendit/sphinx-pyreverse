@@ -15,6 +15,11 @@ if [ -z "$NOSE2_EXE" ]; then
 	exit 2
 fi
 
+printf "Finding files to test "
+printf "with find...\\n"
+PYTHON_FILES=$(find "$(pwd)/sphinx_pyreverse" -iname "*.py" -not -ipath "$(pwd)/*env/*" -print)
+printf "    %s python files found/changed.\\n" "$(echo "$PYTHON_FILES" | wc -l)"
+
 # Runs the unit-tests and the code coverage at the same-time
 python -m coverage run --rcfile=.coveragerc "$NOSE2_EXE" --config unitest.cfg --fail-fast
 EXIT_CODE=$?
@@ -41,7 +46,7 @@ if [ "$COVERAGE" != "100%" ]; then
 fi
 
 # Checks the syntax of all the files match the standards
-find . -iname "*.py" -not -ipath "./*env/*" -print0 | xargs -0 python -m flake8
+python -m flake8 $PYTHON_FILES
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ]; then
 	printf "FLAKE8: Failed\\n"
@@ -49,7 +54,7 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # Checks the syntax of all the files match the standards
-find sphinx_pyreverse -iname "*.py" -not -ipath "./*env/*" -print0 | xargs -0 python -m pylint -E
+python -m pylint -E  $PYTHON_FILES
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ]; then
 	printf "pylint: Failed\\n"
