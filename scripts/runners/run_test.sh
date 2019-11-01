@@ -54,7 +54,7 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # Checks the syntax of all the files match the standards
-python -m pylint -E  $PYTHON_FILES
+python -m pylint --rcfile="$(pwd)"/.pylint.rc $PYTHON_FILES
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ]; then
 	printf "pylint: Failed\\n"
