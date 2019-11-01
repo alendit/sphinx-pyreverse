@@ -14,29 +14,41 @@ _CHECK_OUTPUT_FAILS = False
 
 
 class FailExecuteGuard(object):
-    """ creates and deletes a tmp-dir compatible with python2 and 3 """
+    """ When in scope, causes the subprocess mock to fail """
 
     def __init__(self):
         self.prev = None
 
     def __enter__(self):
-        global _CHECK_OUTPUT_FAILS
+        # This is a bit of hack for testing purposes, means we can only do
+        # single-threaded testing
+        global _CHECK_OUTPUT_FAILS  # pylint: disable=global-statement
         self.prev = _CHECK_OUTPUT_FAILS
         _CHECK_OUTPUT_FAILS = True
         return self
 
     def __exit__(self, x_type, x_value, x_traceback):
-        global _CHECK_OUTPUT_FAILS
+        # This is a bit of hack for testing purposes, means we can only do
+        # single-threaded testing
+        global _CHECK_OUTPUT_FAILS  # pylint: disable=global-statement
         _CHECK_OUTPUT_FAILS = self.prev
 
 
 class CalledProcessError(Exception):
+    """ Mock the exception thrown by subprocess """
+
     def __init__(self):
+        super(CalledProcessError, self).__init__()
         self.output = "dummy output"
         self.returncode = 9
 
 
 def failing_call(_cmd, **args):
+    """ Replaces subprocess check_output()
+
+    When check_output is called, and we are inside the scope of a FailExecuteGuard we
+    raise a CalledProcessError exception """
+
     if _CHECK_OUTPUT_FAILS:
         raise CalledProcessError()
 
