@@ -92,12 +92,17 @@ class TestUMLGenerateDirective(unittest.TestCase):
                 # In python2 we need to define this built-in, but must ignore it on
                 # python3's flake8
                 FileNotFoundError = OSError  # noqa: F823
-            try:
+
+            # Check that spinhx_pyreverse doesn't create all the directories.
+            with self.assertRaises(
+                FileNotFoundError, msg="sphinx_pyreverse should not call mdkir -p"
+            ):
                 instance.run()
-                raise RuntimeError("sphinx_pyreverse should not call mdkir -p")
-            except FileNotFoundError:
-                pass  # aok
+
             self.assertFalse(os.path.exists(mock_dir))
+
+            # Now make the parent dir, sphinx_pyreverse should create everything below
+            # that, to a single depth
             os.mkdir(mock_dir)
             try:
                 instance.run()
