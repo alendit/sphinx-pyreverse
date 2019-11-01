@@ -137,7 +137,7 @@ class TestUMLGenerateDirective(unittest.TestCase):
 
         def scoped_test(width_under_test):
             def open_too_wide_image(_):
-                class MockImage():
+                class MockImage:
                     """ Mocks an image with size params """
 
                     def __init__(self):
