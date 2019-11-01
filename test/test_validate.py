@@ -190,20 +190,20 @@ class TestLogFixture(TestUMLGenerateDirectiveBase):
         return io.StringIO, redirect_stdout
 
     def test_pyreverse_fails(self):
-        def failing_call(_cmd, **args):
-            raise test.mock_subprocess.SUBPROCESS_MOCK.CalledProcessError()
+        with test.mock_subprocess.FailExecuteGuard():
+            self.assertEqual(test.mock_subprocess._CHECK_OUTPUT_FAILS, True)
+            test.mock_subprocess.SUBPROCESS_MOCK.check_output.side_effect = (
+                test.mock_subprocess.CalledProcessError()
+            )
 
-        instance = self.gen()
-        old_call = test.mock_subprocess.SUBPROCESS_MOCK.check_output
-        test.mock_subprocess.SUBPROCESS_MOCK.check_output = failing_call
-        with self.bfunc() as buf, self.redirect_stdout(buf):
-            caught = False
-            try:
-                instance.run()
-            except test.mock_subprocess.CalledProcessError as e:
+            instance = self.gen()
+
+            with self.bfunc() as buf, self.redirect_stdout(buf):
+                with self.assertRaises(test.mock_subprocess.CalledProcessError):
+                    test.mock_subprocess.failing_call("")
+                self.assertEqual(buf.getvalue(), "")
+
+            with self.bfunc() as buf, self.redirect_stdout(buf):
+                with self.assertRaises(test.mock_subprocess.CalledProcessError):
+                    instance.run()
                 self.assertEqual(buf.getvalue(), "dummy output\n")
-                self.assertEqual(e.output, "dummy output")
-                caught = True
-            finally:
-                test.mock_subprocess.SUBPROCESS_MOCK.check_output = old_call
-            self.assertTrue(caught, "Exception not raised inside mock sunprocess")
