@@ -5,8 +5,26 @@ Created on Oct 8, 2019
 
 @author: doublethefish
 """
-from contextlib import redirect_stdout
-import io
+try:
+    from contextlib import redirect_stdout
+    from io import StringIO
+except ImportError:
+    # It's likely we're in pyton2 instead of python3
+    import sys
+    import contextlib
+    from io import BytesIO as StringIO
+
+    @contextlib.contextmanager
+    def redirect_stdout(target):
+        oldio = (sys.stdout, sys.stderr)
+        sys.stdout = target
+        sys.stderr = target
+        try:
+            yield
+        finally:
+            sys.stdout, sys.stderr = oldio
+
+
 import os
 import unittest
 import shutil
@@ -187,7 +205,7 @@ class TestLogFixture(TestUMLGenerateDirectiveBase):
         self.bfunc, self.redirect_stdout = self.do_import()
 
     def do_import(self):
-        return io.StringIO, redirect_stdout
+        return StringIO, redirect_stdout
 
     def test_pyreverse_fails(self):
         with test.mock_subprocess.FailExecuteGuard():
