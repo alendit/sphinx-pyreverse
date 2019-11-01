@@ -24,21 +24,25 @@ class DimsUnderTestGuard(object):
         self._dims = (width, height)
 
     def __enter__(self):
-        global _DIMS_UNDER_TEST
+        # This is a bit of hack for testing purposes, means we can only do
+        # single-threaded testing
+        global _DIMS_UNDER_TEST  # pylint: disable=global-statement
         self._prev = _DIMS_UNDER_TEST
         _DIMS_UNDER_TEST = self._dims
 
         return self
 
     def __exit__(self, x_type, x_value, x_traceback):
-        global _DIMS_UNDER_TEST
+        # This is a bit of hack for testing purposes, means we can only do
+        # single-threaded testing
+        global _DIMS_UNDER_TEST  # pylint: disable=global-statement
         _DIMS_UNDER_TEST = self._prev
 
 
 def _open(_):
     """ returns a dummy image with a size paramter """
 
-    class MockImage:
+    class MockImage(object):
         """ A MockImage with a mock size """
 
         def __init__(self):

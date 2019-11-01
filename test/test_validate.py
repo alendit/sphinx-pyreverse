@@ -11,11 +11,12 @@ try:
 except ImportError:
     # It's likely we're in pyton2 instead of python3
     import sys
-    import contextlib
-    from io import BytesIO as StringIO
+    import contextlib  # pylint: disable=ungrouped-imports
+    from io import BytesIO as StringIO  # pylint: disable=ungrouped-imports
 
     @contextlib.contextmanager
     def redirect_stdout(target):
+        """ Mimics python3's redirect_stdout function """
         oldio = (sys.stdout, sys.stderr)
         sys.stdout = target
         sys.stderr = target
@@ -56,21 +57,21 @@ class TestUMLGenerateDirectiveBase(unittest.TestCase):
     def gen(self):
         """ Constructs and returns a mocked UMLGenerateDirectiver instance """
 
-        class MockEnv:
-            def __init__(self):
+        class MockEnv(object):  # pylint: disable=missing-docstring
+            def __init__(self):  # pylint: disable=missing-docstring
                 self.srcdir = "."
 
-        class MockDocSettings:
-            def __init__(self):
+        class MockDocSettings(object):  # pylint: disable=missing-docstring
+            def __init__(self):  # pylint: disable=missing-docstring
                 self.env = MockEnv()
 
-        class MockDoc:
-            def __init__(self):
+        class MockDoc(object):  # pylint: disable=missing-docstring
+            def __init__(self):  # pylint: disable=missing-docstring
                 self.settings = MockDocSettings()
                 self.current_source = "."
 
-        class MockState:
-            def __init__(self):
+        class MockState(object):  # pylint: disable=missing-docstring
+            def __init__(self):  # pylint: disable=missing-docstring
                 self.document = MockDoc()
 
         return sphinx_pyreverse.UMLGenerateDirective(
@@ -104,18 +105,20 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
 
         This just captures current behaviour - there should be no problem changing it.
         """
+        try:
+            FileNotFoundError  # noqa: F823
+        except NameError:
+            # In python2 we need to define this built-in, but must ignore it on
+            # python3's flake8
+            FileNotFoundError = (  # noqa: F823,E501 pylint: disable=redefined-builtin,invalid-name
+                OSError
+            )
         instance = self.gen()
         with TempdirGuard() as tempdir:
             mock_dir = os.path.join(tempdir.path, "noexist.dir")
             instance.state.document.settings.env.srcdir = mock_dir
             self.assertTrue(os.path.exists(tempdir.path))
             self.assertFalse(os.path.exists(mock_dir))
-            try:
-                FileNotFoundError  # noqa: F823
-            except NameError:
-                # In python2 we need to define this built-in, but must ignore it on
-                # python3's flake8
-                FileNotFoundError = OSError  # noqa: F823
 
             # Check that spinhx_pyreverse doesn't create all the directories.
             with self.assertRaises(
@@ -164,7 +167,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         """ cause UMLGenerateDirective.run() to call generate_image for all branches """
         instance = self.gen()
 
-        def scoped_test(width_under_test, expected_scale):
+        for width_under_test, expected_scale in ((0, 100), (1, 100), (2000, 50)):
             with test.mock_pil.DimsUnderTestGuard(width=width_under_test):
                 mock_module = test.mock_pil.PIL_MOCK.Image  # pylint: disable=no-member
                 actual_width = mock_module.open("noexist").size[0]
@@ -173,9 +176,6 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
                 self.assertEqual(
                     res[0]["scale"], expected_scale, "Failed for %d" % width_under_test
                 )
-
-        for width_under_test, expected_scale in ((0, 100), (1, 100), (2000, 50)):
-            scoped_test(width_under_test, expected_scale)
 
     def test_generate_img_no_pil(self):
         """ ensure we handle not have the PIL library gracefully
@@ -193,30 +193,25 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
 
 
 class TestLogFixture(TestUMLGenerateDirectiveBase):
-    def setUp(self):
-        self.bfunc, self.redirect_stdout = self.do_import()
-
-    def tearDown(self):
-        self.bfunc, self.redirect_stdout = self.do_import()
-
-    def do_import(self):
-        return StringIO, redirect_stdout
+    """ Test logging related aspects of the plugin by capturing output """
 
     def test_pyreverse_fails(self):
+        """ Test that we get output logging when the pyreverse fails """
         with test.mock_subprocess.FailExecuteGuard():
-            self.assertEqual(test.mock_subprocess._CHECK_OUTPUT_FAILS, True)
+            checking = test.mock_subprocess._CHECK_OUTPUT_FAILS  # pylint: disable=W0212
+            self.assertEqual(checking, True)
             mock_module = test.mock_subprocess.SUBPROCESS_MOCK
             func_mock = mock_module.check_output  # pylint: disable=no-member
             func_mock.side_effect = test.mock_subprocess.CalledProcessError()
 
             instance = self.gen()
 
-            with self.bfunc() as buf, self.redirect_stdout(buf):
+            with StringIO() as buf, redirect_stdout(buf):
                 with self.assertRaises(test.mock_subprocess.CalledProcessError):
                     test.mock_subprocess.failing_call("")
                 self.assertEqual(buf.getvalue(), "")
 
-            with self.bfunc() as buf, self.redirect_stdout(buf):
+            with StringIO() as buf, redirect_stdout(buf):
                 with self.assertRaises(test.mock_subprocess.CalledProcessError):
                     instance.run()
                 self.assertEqual(buf.getvalue(), "dummy output\n")
