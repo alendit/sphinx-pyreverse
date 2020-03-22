@@ -178,6 +178,27 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         """ simply calls the setup function, ensuring no errors """
         self.assertEqual(sphinx_pyreverse.setup(Mock()), None)
 
+    def test_non_default_options(self):
+        """ Simply calls run with non-default pyreverse options
+
+        The intent here is to get 100% coverage and not test the functionality of
+        pyreverse itself, we trust that that is working as per contract """
+        state = MockState()
+        config = state.document.settings.env.config
+
+        instance = self.gen()
+
+        self.assertEqual(config.sphinx_pyreverse_output, "png")
+
+        # Set the config to non-default values
+        config.sphinx_pyreverse_output = "dot"
+
+        self.assertEqual(config.sphinx_pyreverse_output, "dot")
+
+        instance._build_command(  # pylint: disable=protected-access
+            "test_module", config=config
+        )
+
 
 class TestLogFixture(TestUMLGenerateDirectiveBase):
     """ Test logging related aspects of the plugin by capturing output """

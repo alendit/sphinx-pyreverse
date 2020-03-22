@@ -7,9 +7,15 @@ Created on 22, 2020
 """
 
 
+class MockConfig(object):  # pylint: disable=missing-docstring
+    def __init__(self):  # pylint: disable=missing-docstring
+        self.sphinx_pyreverse_output = "png"
+
+
 class MockEnv(object):  # pylint: disable=missing-docstring
     def __init__(self):  # pylint: disable=missing-docstring
         self.srcdir = "."
+        self.config = MockConfig()
 
 
 class MockDocSettings(object):  # pylint: disable=missing-docstring
