@@ -51,7 +51,7 @@ class UMLGenerateDirective(Directive):
                 )
             )
 
-    def _build_command(self, module_name, config):
+    def _build_command(self, module_name, config):  # noqa: C901 func too-complex
         cmd = [
             "pyreverse",
             "--output",
@@ -59,6 +59,27 @@ class UMLGenerateDirective(Directive):
             "--project",
             module_name,
         ]
+        if config.sphinx_pyreverse_filter_mode:
+            assert config.sphinx_pyreverse_filter_mode
+            cmd.extend(("--filter-mode", config.sphinx_pyreverse_filter_mode))
+        if config.sphinx_pyreverse_class:
+            cmd.extend(("--class", config.sphinx_pyreverse_class))
+        if config.sphinx_pyreverse_show_ancestors:
+            cmd.extend(("--show-ancestors", config.sphinx_pyreverse_show_ancestors))
+        if config.sphinx_pyreverse_all_ancestors:
+            cmd.append("--all-ancestors")
+        if config.sphinx_pyreverse_show_associated:
+            cmd.extend(("--show-associated", config.sphinx_pyreverse_show_associated))
+        if config.sphinx_pyreverse_all_associated:
+            cmd.append("--all-associated")
+        if config.sphinx_pyreverse_show_builtin:
+            cmd.append("--show-builtin")
+        if config.sphinx_pyreverse_module_names:
+            cmd.extend(("--module-names", config.sphinx_pyreverse_module_names))
+        if config.sphinx_pyreverse_only_classnames:
+            cmd.append("--only-classnames")
+        if config.sphinx_pyreverse_ignore:
+            cmd.extend(("--ignore", config.sphinx_pyreverse_ignore))
 
         # finally append the module to generate the uml for
         cmd.append(module_name)

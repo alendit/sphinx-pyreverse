@@ -189,12 +189,47 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         instance = self.gen()
 
         self.assertEqual(config.sphinx_pyreverse_output, "png")
+        self.assertEqual(config.sphinx_pyreverse_filter_mode, None)
+        self.assertEqual(config.sphinx_pyreverse_class, None)
+        self.assertEqual(config.sphinx_pyreverse_show_ancestors, None)
+        self.assertEqual(config.sphinx_pyreverse_all_ancestors, None)
+        self.assertEqual(config.sphinx_pyreverse_show_associated, None)
+        self.assertEqual(config.sphinx_pyreverse_all_associated, None)
+        self.assertEqual(config.sphinx_pyreverse_show_builtin, None)
+        self.assertEqual(config.sphinx_pyreverse_module_names, None)
+        self.assertEqual(config.sphinx_pyreverse_only_classnames, None)
+        self.assertEqual(config.sphinx_pyreverse_ignore, None)
 
         # Set the config to non-default values
         config.sphinx_pyreverse_output = "dot"
+        config.sphinx_pyreverse_filter_mode = "ALL"
+        config.sphinx_pyreverse_class = "invalid-class"
+        config.sphinx_pyreverse_show_ancestors = "invalid-class"
+        config.sphinx_pyreverse_all_ancestors = True
+        config.sphinx_pyreverse_show_associated = 100
+        config.sphinx_pyreverse_all_associated = True
+        config.sphinx_pyreverse_show_builtin = True
+        config.sphinx_pyreverse_module_names = "y"
+        config.sphinx_pyreverse_ignore = "noexist.py,secondnoeexist.py"
 
         self.assertEqual(config.sphinx_pyreverse_output, "dot")
+        self.assertEqual(config.sphinx_pyreverse_filter_mode, "ALL")
+        self.assertEqual(config.sphinx_pyreverse_class, "invalid-class")
+        self.assertEqual(config.sphinx_pyreverse_show_ancestors, "invalid-class")
+        self.assertEqual(config.sphinx_pyreverse_all_ancestors, True)
+        self.assertEqual(config.sphinx_pyreverse_show_associated, 100)
+        self.assertEqual(config.sphinx_pyreverse_all_associated, True)
+        self.assertEqual(config.sphinx_pyreverse_show_builtin, True)
+        self.assertEqual(config.sphinx_pyreverse_module_names, "y")
+        self.assertEqual(config.sphinx_pyreverse_ignore, "noexist.py,secondnoeexist.py")
 
+        instance._build_command(  # pylint: disable=protected-access
+            "test_module", config=config
+        )
+
+        # disables --filter option, so run separately
+        config.sphinx_pyreverse_only_classnames = True
+        self.assertEqual(config.sphinx_pyreverse_only_classnames, True)
         instance._build_command(  # pylint: disable=protected-access
             "test_module", config=config
         )
