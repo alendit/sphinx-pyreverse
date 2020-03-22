@@ -33,6 +33,8 @@ import tempfile
 
 import test.mock_subprocess
 import test.mock_pil
+from test.sphinx_test_util import MockState
+
 from mock import Mock
 import sphinx_pyreverse
 import sphinx_pyreverse.uml_generate_directive
@@ -57,22 +59,7 @@ class TestUMLGenerateDirectiveBase(unittest.TestCase):
     def gen(self):
         """ Constructs and returns a mocked UMLGenerateDirectiver instance """
 
-        class MockEnv(object):  # pylint: disable=missing-docstring
-            def __init__(self):  # pylint: disable=missing-docstring
-                self.srcdir = "."
-
-        class MockDocSettings(object):  # pylint: disable=missing-docstring
-            def __init__(self):  # pylint: disable=missing-docstring
-                self.env = MockEnv()
-
-        class MockDoc(object):  # pylint: disable=missing-docstring
-            def __init__(self):  # pylint: disable=missing-docstring
-                self.settings = MockDocSettings()
-                self.current_source = "."
-
-        class MockState(object):  # pylint: disable=missing-docstring
-            def __init__(self):  # pylint: disable=missing-docstring
-                self.document = MockDoc()
+        state = MockState()
 
         return sphinx_pyreverse.UMLGenerateDirective(
             name="test",
@@ -82,7 +69,7 @@ class TestUMLGenerateDirectiveBase(unittest.TestCase):
             lineno=None,
             content_offset=None,
             block_text=None,
-            state=MockState(),
+            state=state,
             state_machine=None,
         )
 
