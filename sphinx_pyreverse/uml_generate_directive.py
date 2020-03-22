@@ -11,6 +11,7 @@ import subprocess
 
 from docutils import nodes
 from docutils.parsers.rst import directives
+from sphinx.util import logging
 
 try:
     from sphinx.util.compat import Directive
@@ -82,6 +83,7 @@ class UMLGenerateDirective(Directive):
 
         if module_name not in self.generated_modules:
             cmd = self._build_command(module_name)
+            logging.getLogger(__name__).info("Running: {cmd}".format(cmd=" ".join(cmd)))
             try:
                 subprocess.check_output(
                     cmd, cwd=uml_dir,

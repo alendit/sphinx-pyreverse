@@ -8,6 +8,7 @@ Created on Oct 8, 2019
 """
 import sys
 import types
+from mock import MagicMock
 
 
 _CHECK_OUTPUT_FAILS = False
@@ -58,3 +59,6 @@ SUBPROCESS_MOCK = types.ModuleType(SUBPROCESS_MODULE_NAME)
 sys.modules[SUBPROCESS_MODULE_NAME] = SUBPROCESS_MOCK
 SUBPROCESS_MOCK.check_output = failing_call
 SUBPROCESS_MOCK.CalledProcessError = CalledProcessError
+SUBPROCESS_MOCK.PIPE = MagicMock()
+SUBPROCESS_MOCK.STDOUT = MagicMock()
+SUBPROCESS_MOCK.DEVNULL = MagicMock()
