@@ -4,3 +4,4 @@ mock
 docutils
 flake8
 pylint
+sphinx
