@@ -50,6 +50,19 @@ class UMLGenerateDirective(Directive):
                 )
             )
 
+    def _build_command(self, module_name):
+        cmd = [
+            "pyreverse",
+            "--output",
+            "png",
+            "--project",
+            module_name,
+        ]
+
+        # finally append the module to generate the uml for
+        cmd.append(module_name)
+        return cmd
+
     def run(self):
         doc = self.state.document
         env = doc.settings.env
@@ -68,10 +81,10 @@ class UMLGenerateDirective(Directive):
         self._validate()
 
         if module_name not in self.generated_modules:
+            cmd = self._build_command(module_name)
             try:
                 subprocess.check_output(
-                    ["pyreverse", "-o", "png", "-p", module_name, module_name],
-                    cwd=uml_dir,
+                    cmd, cwd=uml_dir,
                 )
             except subprocess.CalledProcessError as error:
                 print(error.output)
