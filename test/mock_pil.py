@@ -45,6 +45,8 @@ def _open(_):
     class MockImage(object):
         """ A MockImage with a mock size """
 
+        __slots__ = ("size",)
+
         def __init__(self):
             self.size = _DIMS_UNDER_TEST
 
