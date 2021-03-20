@@ -16,7 +16,7 @@ for python_version in "python3" "python2"; do
 
   source "$VENV_DIR"/bin/activate || exit 2
 
-  pip install -r pip-requirements-test 2>&1 | sed 's/^/'"$python_version"': /' || exit 2
+  pip install .["tests"] 2>&1 | sed 's/^/'"$python_version"': /' || exit 2
 
   ./scripts/runners/run_test.sh 2>&1 | sed 's/^/'"$python_version"': /' || exit 2
 

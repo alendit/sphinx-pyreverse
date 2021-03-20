@@ -29,7 +29,21 @@ setup(
     description=(
         "A simple sphinx extension to generate " "UML diagrams with pyreverse"
     ),
-    install_requires=["sphinx", "docutils"],
+    extras_require={
+        "tests": [
+            "coverage",
+            "docutils",
+            "flake8",
+            "mock",
+            "nose2",
+            "pylint",
+            "sphinx",
+        ],
+    },
+    install_requires=[
+        "docutils",
+        "sphinx",
+    ],
     keywords="sphinx extension uml pyreverse",
     license="GPLv3",
     long_description=read("README.rst"),
