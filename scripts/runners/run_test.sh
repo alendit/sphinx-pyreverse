@@ -34,17 +34,6 @@ if [ $EXIT_CODE -ne 0 ]; then
 	exit $EXIT_CODE
 fi
 
-# Get the coverage percentage
-COVERAGE=$(coverage report --rcfile=.coveragerc -m --omit=*python*-packages* | grep "TOTAL.\+" | awk '{print $6}')
-if [ "$COVERAGE" != "100%" ]; then
-	# if we only have a single file we need to look at that file only
-	COVERAGE=$(coverage report --rcfile=.coveragerc -m --omit=*python*-packages* | grep "%" | awk '{print $6}')
-	if [ "$COVERAGE" != "100%" ]; then
-		printf "COVERAGE: Failed: '%s' is not '100%%' \\n" "$COVERAGE"
-		exit 2
-	fi
-fi
-
 # Checks the syntax of all the files match the standards
 python -m flake8 $PYTHON_FILES
 EXIT_CODE=$?
@@ -59,4 +48,15 @@ EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ]; then
 	printf "pylint: Failed\\n"
 	exit $EXIT_CODE
+fi
+
+# Get the coverage percentage
+COVERAGE=$(coverage report --rcfile=.coveragerc -m --omit=*python*-packages* | grep "TOTAL.\+" | awk '{print $6}')
+if [ "$COVERAGE" != "100%" ]; then
+	# if we only have a single file we need to look at that file only
+	COVERAGE=$(coverage report --rcfile=.coveragerc -m --omit=*python*-packages* | grep "%" | awk '{print $6}')
+	if [ "$COVERAGE" != "100%" ]; then
+		printf "COVERAGE: Failed: '%s' is not '100%%' \\n" "$COVERAGE"
+		exit 2
+	fi
 fi

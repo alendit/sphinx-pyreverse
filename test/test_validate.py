@@ -33,6 +33,8 @@ import tempfile
 
 import test.mock_subprocess
 import test.mock_pil
+from test.sphinx_test_util import MockState
+
 from mock import Mock
 import sphinx_pyreverse
 import sphinx_pyreverse.uml_generate_directive
@@ -57,22 +59,7 @@ class TestUMLGenerateDirectiveBase(unittest.TestCase):
     def gen(self):
         """ Constructs and returns a mocked UMLGenerateDirectiver instance """
 
-        class MockEnv(object):  # pylint: disable=missing-docstring
-            def __init__(self):  # pylint: disable=missing-docstring
-                self.srcdir = "."
-
-        class MockDocSettings(object):  # pylint: disable=missing-docstring
-            def __init__(self):  # pylint: disable=missing-docstring
-                self.env = MockEnv()
-
-        class MockDoc(object):  # pylint: disable=missing-docstring
-            def __init__(self):  # pylint: disable=missing-docstring
-                self.settings = MockDocSettings()
-                self.current_source = "."
-
-        class MockState(object):  # pylint: disable=missing-docstring
-            def __init__(self):  # pylint: disable=missing-docstring
-                self.document = MockDoc()
+        state = MockState()
 
         return sphinx_pyreverse.UMLGenerateDirective(
             name="test",
@@ -82,7 +69,7 @@ class TestUMLGenerateDirectiveBase(unittest.TestCase):
             lineno=None,
             content_offset=None,
             block_text=None,
-            state=MockState(),
+            state=state,
             state_machine=None,
         )
 
@@ -190,6 +177,62 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
     def test_setup(self):
         """ simply calls the setup function, ensuring no errors """
         self.assertEqual(sphinx_pyreverse.setup(Mock()), None)
+
+    def test_non_default_options(self):
+        """ Simply calls run with non-default pyreverse options
+
+        The intent here is to get 100% coverage and not test the functionality of
+        pyreverse itself, we trust that that is working as per contract """
+        state = MockState()
+        config = state.document.settings.env.config
+
+        instance = self.gen()
+
+        self.assertEqual(config.sphinx_pyreverse_output, "png")
+        self.assertEqual(config.sphinx_pyreverse_filter_mode, None)
+        self.assertEqual(config.sphinx_pyreverse_class, None)
+        self.assertEqual(config.sphinx_pyreverse_show_ancestors, None)
+        self.assertEqual(config.sphinx_pyreverse_all_ancestors, None)
+        self.assertEqual(config.sphinx_pyreverse_show_associated, None)
+        self.assertEqual(config.sphinx_pyreverse_all_associated, None)
+        self.assertEqual(config.sphinx_pyreverse_show_builtin, None)
+        self.assertEqual(config.sphinx_pyreverse_module_names, None)
+        self.assertEqual(config.sphinx_pyreverse_only_classnames, None)
+        self.assertEqual(config.sphinx_pyreverse_ignore, None)
+
+        # Set the config to non-default values
+        config.sphinx_pyreverse_output = "dot"
+        config.sphinx_pyreverse_filter_mode = "ALL"
+        config.sphinx_pyreverse_class = "invalid-class"
+        config.sphinx_pyreverse_show_ancestors = "invalid-class"
+        config.sphinx_pyreverse_all_ancestors = True
+        config.sphinx_pyreverse_show_associated = 100
+        config.sphinx_pyreverse_all_associated = True
+        config.sphinx_pyreverse_show_builtin = True
+        config.sphinx_pyreverse_module_names = "y"
+        config.sphinx_pyreverse_ignore = "noexist.py,secondnoeexist.py"
+
+        self.assertEqual(config.sphinx_pyreverse_output, "dot")
+        self.assertEqual(config.sphinx_pyreverse_filter_mode, "ALL")
+        self.assertEqual(config.sphinx_pyreverse_class, "invalid-class")
+        self.assertEqual(config.sphinx_pyreverse_show_ancestors, "invalid-class")
+        self.assertEqual(config.sphinx_pyreverse_all_ancestors, True)
+        self.assertEqual(config.sphinx_pyreverse_show_associated, 100)
+        self.assertEqual(config.sphinx_pyreverse_all_associated, True)
+        self.assertEqual(config.sphinx_pyreverse_show_builtin, True)
+        self.assertEqual(config.sphinx_pyreverse_module_names, "y")
+        self.assertEqual(config.sphinx_pyreverse_ignore, "noexist.py,secondnoeexist.py")
+
+        instance._build_command(  # pylint: disable=protected-access
+            "test_module", config=config
+        )
+
+        # disables --filter option, so run separately
+        config.sphinx_pyreverse_only_classnames = True
+        self.assertEqual(config.sphinx_pyreverse_only_classnames, True)
+        instance._build_command(  # pylint: disable=protected-access
+            "test_module", config=config
+        )
 
 
 class TestLogFixture(TestUMLGenerateDirectiveBase):
