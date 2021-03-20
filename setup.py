@@ -19,15 +19,6 @@ setup(
     version="0.0.13",
     author="Dimitri Vorona",
     author_email="vorona@in.tum.de",
-    description=(
-        "A simple sphinx extension to generate " "UML diagrams with pyreverse"
-    ),
-    license="GPLv3",
-    keywords="sphinx extension uml pyreverse",
-    url="https://github.com/alendit/sphinx-pyreverse",
-    long_description=read("README.rst"),
-    packages=["sphinx_pyreverse"],
-    install_requires=["sphinx", "docutils"],
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Information Technology",
@@ -35,4 +26,13 @@ setup(
         "Programming Language :: Python",
         "Topic :: Utilities",
     ],
+    description=(
+        "A simple sphinx extension to generate " "UML diagrams with pyreverse"
+    ),
+    install_requires=["sphinx", "docutils"],
+    keywords="sphinx extension uml pyreverse",
+    license="GPLv3",
+    long_description=read("README.rst"),
+    packages=["sphinx_pyreverse"],
+    url="https://github.com/alendit/sphinx-pyreverse",
 )
