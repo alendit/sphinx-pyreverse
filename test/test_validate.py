@@ -121,9 +121,11 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
             try:
                 instance.run()
             except FileNotFoundError:
-                raise RuntimeError(
+                error = RuntimeError(
                     "sphinx_pyreverse should have created a single directory"
                 )
+                # As we currently support python2, ignore py3 specific re-raise syntax
+                raise error  # pylint: disable=W0707
             self.assertTrue(os.path.exists(mock_dir))
 
     def test_generate_same_twice(self):

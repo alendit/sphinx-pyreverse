@@ -39,7 +39,7 @@ class CalledProcessError(Exception):
     """ Mock the exception thrown by subprocess """
 
     def __init__(self):
-        super(CalledProcessError, self).__init__()
+        super(CalledProcessError, self).__init__()  # pylint: disable=R1725
         self.output = "dummy output"
         self.returncode = 9
 
