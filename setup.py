@@ -30,6 +30,10 @@ setup(
         "A simple sphinx extension to generate " "UML diagrams with pyreverse"
     ),
     extras_require={
+        "deploy": [
+            # deps for deploying
+            "twine",
+        ],
         "pil": [
             # because of the vaious ways of getting PIL we reccomend, but do
             # not enfore, pillow
