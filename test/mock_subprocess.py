@@ -45,10 +45,10 @@ class CalledProcessError(Exception):
 
 
 def failing_call(_cmd, **args):
-    """ Replaces subprocess check_output()
+    """Replaces subprocess check_output()
 
     When check_output is called, and we are inside the scope of a FailExecuteGuard we
-    raise a CalledProcessError exception """
+    raise a CalledProcessError exception"""
 
     if _CHECK_OUTPUT_FAILS:
         raise CalledProcessError()

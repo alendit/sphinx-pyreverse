@@ -107,7 +107,8 @@ class UMLGenerateDirective(Directive):
             logging.getLogger(__name__).info("Running: {cmd}".format(cmd=" ".join(cmd)))
             try:
                 subprocess.check_output(
-                    cmd, cwd=uml_dir,
+                    cmd,
+                    cwd=uml_dir,
                 )
             except subprocess.CalledProcessError as error:
                 print(error.output)

@@ -88,7 +88,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         instance.run()
 
     def test_uml_dir_creation(self):
-        """ test that the uml directory is created under the right circumstances
+        """test that the uml directory is created under the right circumstances
 
         This just captures current behaviour - there should be no problem changing it.
         """
@@ -165,9 +165,9 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
                 )
 
     def test_generate_img_no_pil(self):
-        """ ensure we handle not have the PIL library gracefully
+        """ensure we handle not have the PIL library gracefully
 
-        The intent is to resize too-wide files """
+        The intent is to resize too-wide files"""
         instance = self.gen()
         old_image = sphinx_pyreverse.uml_generate_directive.IMAGE
         sphinx_pyreverse.uml_generate_directive.IMAGE = None
@@ -179,10 +179,10 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         self.assertEqual(sphinx_pyreverse.setup(Mock()), None)
 
     def test_non_default_options(self):
-        """ Simply calls run with non-default pyreverse options
+        """Simply calls run with non-default pyreverse options
 
         The intent here is to get 100% coverage and not test the functionality of
-        pyreverse itself, we trust that that is working as per contract """
+        pyreverse itself, we trust that that is working as per contract"""
         state = MockState()
         config = state.document.settings.env.config
 
