@@ -9,7 +9,7 @@ try:
     from contextlib import redirect_stdout
     from io import StringIO
 except ImportError:
-    # It's likely we're in pyton2 instead of python3
+    # It's likely we're in python2 instead of python3
     import sys
     import contextlib  # pylint: disable=ungrouped-imports
     from io import BytesIO as StringIO  # pylint: disable=ungrouped-imports
