@@ -31,3 +31,7 @@ def setup(app):
     # Allow override of the directive, defaulting to 'uml'
     directive_name_to_use = os.environ.get("SPHINX_PYREVERSE_DIRECTIVE", "uml")
     app.add_directive(directive_name_to_use, UMLGenerateDirective)
+
+    return {
+        'parallel_read_safe': True
+    }
