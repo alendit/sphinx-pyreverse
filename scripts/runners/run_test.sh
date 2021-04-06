@@ -21,7 +21,9 @@ PYTHON_FILES=$(find "$(pwd)" -iname "*.py" -not -ipath "$(pwd)/*env/*" -not -ipa
 printf "    %s python files found/changed.\\n" "$(echo "$PYTHON_FILES" | wc -l)"
 
 # Runs the unit-tests and the code coverage at the same-time
-python -m coverage run --rcfile=.coveragerc "$NOSE2_EXE" --config unitest.cfg --fail-fast
+CMD="python -m coverage run --rcfile=.coveragerc $NOSE2_EXE --config unitest.cfg --fail-fast"
+echo $CMD
+$CMD
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ]; then
 	exit $EXIT_CODE
