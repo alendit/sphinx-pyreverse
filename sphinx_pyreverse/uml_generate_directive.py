@@ -6,7 +6,9 @@ First, Created on Oct 1, 2012, this file created on Oct 8, 2019
 @author: alendit, doublethefish
 """
 
+import copy
 import os
+import sys
 import subprocess
 
 from docutils import nodes
@@ -105,10 +107,20 @@ class UMLGenerateDirective(Directive):
         if module_name not in self.generated_modules:
             cmd = self._build_command(module_name, env.config)
             logging.getLogger(__name__).info("Running: {cmd}".format(cmd=" ".join(cmd)))
+
+            # Ensure we have the right paths available to the pyreverse subproc
+            if "PYTHONPATH" in os.environ:
+                sub_proc_env = os.environ
+            else:
+                sub_proc_env = copy.deepcopy(os.environ)
+                # TODO: check this is ok on windows etc.
+                sub_proc_env["PYTHONPATH"] = ":".join(sys.path)
+
             try:
                 subprocess.check_output(
                     cmd,
                     cwd=uml_dir,
+                    env=sub_proc_env, # use the calling-env for the subproc (paths etc)
                 )
             except subprocess.CalledProcessError as error:
                 print(error.output)
