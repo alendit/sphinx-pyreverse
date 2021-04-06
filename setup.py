@@ -45,12 +45,13 @@ setup(
             "flake8",
             "mock",
             "nose2",
-            "pylint",
             "sphinx",
         ],
     },
     install_requires=[
+        "astroid<=2.4.2",
         "docutils",
+        "pylint",  # for `pyreverse`
         "sphinx",
     ],
     keywords="sphinx extension uml pyreverse",
