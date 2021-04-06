@@ -106,7 +106,9 @@ class UMLGenerateDirective(Directive):
 
         if module_name not in self.generated_modules:
             cmd = self._build_command(module_name, env.config)
-            logging.getLogger(__name__).info("sphinx-pyreverse: Running: {cmd}".format(cmd=" ".join(cmd)))
+            logging.getLogger(__name__).info(
+                "sphinx-pyreverse: Running: {cmd}".format(cmd=" ".join(cmd))
+            )
 
             # Ensure we have the right paths available to the pyreverse subproc
             if "PYTHONPATH" in os.environ:
@@ -120,7 +122,7 @@ class UMLGenerateDirective(Directive):
                 subprocess.check_output(
                     cmd,
                     cwd=uml_dir,
-                    env=sub_proc_env, # use the calling-env for the subproc (paths etc)
+                    env=sub_proc_env,  # use the calling-env for the subproc (paths etc)
                 )
             except subprocess.CalledProcessError as error:
                 for line in str(error.output).split("\\n"):
