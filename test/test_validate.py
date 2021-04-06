@@ -26,6 +26,7 @@ except ImportError:
             sys.stdout, sys.stderr = oldio
 
 
+import logging
 import os
 import unittest
 import shutil
@@ -51,6 +52,39 @@ class TempdirGuard(object):
 
     def __exit__(self, x_type, x_value, x_traceback):
         shutil.rmtree(self.path)  # always clean up on exit
+
+
+class CaptureLogger(object):
+    """Context manager to capture `logging` streams
+
+    Args:
+        - logger: 'logging` logger object
+        - string_buff: StringIO object to put the log output to
+
+    Results:
+        The captured output is available via the object passed in as string_buf
+
+    """
+
+    def __init__(self, logger, string_buf):
+        self.logger = logger
+        self.string_buf = string_buf
+        self.handler = logging.StreamHandler(self.string_buf)
+        self.old_handlers = []
+        self.old_level = None
+
+    def __enter__(self):
+        self.logger.level = logging.DEBUG
+        self.logger.handlers = []
+        self.logger.addHandler(self.handler)
+        self.old_handlers = self.logger.handlers
+        self.old_level = self.logger.level
+        return self
+
+    def __exit__(self, *exc):
+        self.logger.removeHandler(self.handler)
+        self.logger.handlers = self.old_handlers
+        self.logger.level = self.old_level
 
 
 class TestUMLGenerateDirectiveBase(unittest.TestCase):
@@ -178,7 +212,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
 
     def test_setup(self):
         """ simply calls the setup function, ensuring no errors """
-        self.assertEqual(sphinx_pyreverse.setup(Mock()), None)
+        self.assertEqual(sphinx_pyreverse.setup(Mock()), {"parallel_read_safe": True})
 
     def test_non_default_options(self):
         """Simply calls run with non-default pyreverse options
@@ -251,12 +285,26 @@ class TestLogFixture(TestUMLGenerateDirectiveBase):
 
             instance = self.gen()
 
-            with StringIO() as buf, redirect_stdout(buf):
+            with StringIO() as buf, redirect_stdout(buf), CaptureLogger(
+                logging.getLogger(), buf
+            ):
                 with self.assertRaises(test.mock_subprocess.CalledProcessError):
                     test.mock_subprocess.failing_call("")
+
+                # nothing should be logged to stdout or put to logs
                 self.assertEqual(buf.getvalue(), "")
 
-            with StringIO() as buf, redirect_stdout(buf):
+            with StringIO() as buf, redirect_stdout(buf), CaptureLogger(
+                logging.getLogger(), buf
+            ):
                 with self.assertRaises(test.mock_subprocess.CalledProcessError):
                     instance.run()
-                self.assertEqual(buf.getvalue(), "dummy output\n")
+
+                expected_output = (
+                    "sphinx-pyreverse: Running: pyreverse --output png --project "
+                    "noexist_module noexist_module\n"
+                    "pyreverse-log: dummy output\n"
+                )
+
+                # nothing should be printed to stdout or the logger
+                self.assertEqual(buf.getvalue(), expected_output)

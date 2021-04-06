@@ -106,10 +106,12 @@ class UMLGenerateDirective(Directive):
 
         if module_name not in self.generated_modules:
             cmd = self._build_command(module_name, env.config)
-            logging.getLogger(__name__).info("sphinx-pyreverse: Running: {cmd}".format(cmd=" ".join(cmd)))
+            logging.getLogger(__name__).info(
+                "sphinx-pyreverse: Running: {cmd}".format(cmd=" ".join(cmd))
+            )
 
             # Ensure we have the right paths available to the pyreverse subproc
-            if "PYTHONPATH" in os.environ:
+            if "PYTHONPATH" in os.environ:  # pragma: no cover
                 sub_proc_env = os.environ
             else:
                 sub_proc_env = copy.deepcopy(os.environ)
@@ -120,11 +122,13 @@ class UMLGenerateDirective(Directive):
                 subprocess.check_output(
                     cmd,
                     cwd=uml_dir,
-                    env=sub_proc_env, # use the calling-env for the subproc (paths etc)
+                    env=sub_proc_env,  # use the calling-env for the subproc (paths etc)
                 )
             except subprocess.CalledProcessError as error:
                 for line in str(error.output).split("\\n"):
-                    logging.getLogger(__name__).info(f"pyreverse-log: {line}")
+                    logging.getLogger(__name__).info(
+                        "pyreverse-log: {line}".format(line=line)
+                    )
                 raise
 
             # avoid double-generating
@@ -154,4 +158,8 @@ class UMLGenerateDirective(Directive):
             image_width = i.size[0]
             if image_width > max_width:
                 scale = max_width * scale / image_width
+        else:
+            logging.getLogger(__name__).warning(
+                "sphinx-pyreverse: No image manipulation lib found!"
+            )
         return nodes.image(uri=uri, scale=scale)

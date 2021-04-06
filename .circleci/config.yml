@@ -10,7 +10,7 @@ jobs:
           command: python --version
       - run: 
           name: Install deps
-          command: python -m pip install --user -r pip-requirements-test
+          command: python -m pip install --user .["tests"]
       - run: 
           name: test
           command: scripts/runners/run_test.sh
@@ -24,7 +24,7 @@ jobs:
           command: python --version
       - run: 
           name: Install deps
-          command: python -m pip install --user -r pip-requirements-test
+          command: python -m pip install --user .["tests"]
       - run: 
           name: test
           command: scripts/runners/run_test.sh
