@@ -156,4 +156,8 @@ class UMLGenerateDirective(Directive):
             image_width = i.size[0]
             if image_width > max_width:
                 scale = max_width * scale / image_width
+        else:
+            logging.getLogger(__name__).warning(
+                "sphinx-pyreverse: No image manipulation lib found!"
+            )
         return nodes.image(uri=uri, scale=scale)
