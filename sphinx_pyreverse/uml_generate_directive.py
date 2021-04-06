@@ -126,7 +126,9 @@ class UMLGenerateDirective(Directive):
                 )
             except subprocess.CalledProcessError as error:
                 for line in str(error.output).split("\\n"):
-                    logging.getLogger(__name__).info(f"pyreverse-log: {line}")
+                    logging.getLogger(__name__).info(
+                        "pyreverse-log: {line}".format(line=line)
+                    )
                 raise
 
             # avoid double-generating
