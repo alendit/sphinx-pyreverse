@@ -178,7 +178,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
 
     def test_setup(self):
         """ simply calls the setup function, ensuring no errors """
-        self.assertEqual(sphinx_pyreverse.setup(Mock()), None)
+        self.assertEqual(sphinx_pyreverse.setup(Mock()), {"parallel_read_safe": True})
 
     def test_non_default_options(self):
         """Simply calls run with non-default pyreverse options
