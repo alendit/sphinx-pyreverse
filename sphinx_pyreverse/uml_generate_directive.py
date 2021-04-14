@@ -32,6 +32,10 @@ except ImportError:  # pragma: no cover
 # ~ pass
 
 
+class SphinxPyreverseError(RuntimeError):
+    """An error thrown with problems found runnig pyreverse"""
+
+
 class UMLGenerateDirective(Directive):
     """UML directive to generate a pyreverse diagram"""
 
@@ -130,7 +134,9 @@ class UMLGenerateDirective(Directive):
                     logging.getLogger(__name__).info(
                         "pyreverse-log: {line}".format(line=line)
                     )
-                raise
+                raise SphinxPyreverseError(
+                    "`pyreverse` sub-command failed. Check log output above"
+                ) from error
 
             # avoid double-generating
             self.generated_modules.append(module_name)

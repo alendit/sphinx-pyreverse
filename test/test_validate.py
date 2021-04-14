@@ -39,6 +39,7 @@ from test.sphinx_test_util import MockState
 from mock import Mock
 import sphinx_pyreverse
 import sphinx_pyreverse.uml_generate_directive
+from sphinx_pyreverse.uml_generate_directive import SphinxPyreverseError
 
 
 class TempdirGuard(object):
@@ -281,7 +282,7 @@ class TestLogFixture(TestUMLGenerateDirectiveBase):
             self.assertEqual(checking, True)
             mock_module = test.mock_subprocess.SUBPROCESS_MOCK
             func_mock = mock_module.check_output  # pylint: disable=no-member
-            func_mock.side_effect = test.mock_subprocess.CalledProcessError()
+            func_mock.side_effect = SphinxPyreverseError()
 
             instance = self.gen()
 
@@ -297,7 +298,7 @@ class TestLogFixture(TestUMLGenerateDirectiveBase):
             with StringIO() as buf, redirect_stdout(buf), CaptureLogger(
                 logging.getLogger(), buf
             ):
-                with self.assertRaises(test.mock_subprocess.CalledProcessError):
+                with self.assertRaises(SphinxPyreverseError):
                     instance.run()
 
                 expected_output = (
