@@ -192,7 +192,11 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         instance = self.gen()
 
         for width_under_test, expected_scale in ((0, 100), (1, 100), (2000, 50)):
-            with test.mock_pil.DimsUnderTestGuard(width=width_under_test):
+            with test.mock_pil.DimsUnderTestGuard(
+                width=width_under_test
+            ), TempdirGuard() as tempdir:
+                mock_dir = os.path.join(tempdir.path, "noexist.dir")
+                instance.state.document.settings.env.srcdir = mock_dir
                 mock_module = test.mock_pil.PIL_MOCK.Image  # pylint: disable=no-member
                 actual_width = mock_module.open("noexist").size[0]
                 self.assertEqual(actual_width, width_under_test)

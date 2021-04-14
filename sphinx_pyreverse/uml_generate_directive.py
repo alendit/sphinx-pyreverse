@@ -160,8 +160,17 @@ class UMLGenerateDirective(Directive):
         uri = directives.uri(os.path.join(src_base, path_from_base))
         scale = 100
         max_width = 1000
+        image_path = os.path.join(base_dir, path_from_base)
+        if not os.path.exists(image_path):
+            raise SphinxPyreverseError(
+                (
+                    "Check your pyreverse and GarphViz installs, pyreverse "
+                    f"failed to generate image `{image_path}` "
+                    "\n(this is possibly a GraphViz config issue)"
+                )
+            )
         if IMAGE:
-            i = IMAGE.open(os.path.join(base_dir, path_from_base))
+            i = IMAGE.open(image_path)
             image_width = i.size[0]
             if image_width > max_width:
                 scale = max_width * scale / image_width
