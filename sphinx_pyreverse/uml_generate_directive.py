@@ -116,7 +116,8 @@ class UMLGenerateDirective(Directive):
             else:
                 sub_proc_env = copy.deepcopy(os.environ)
                 # TODO: check this is ok on windows etc.
-                sub_proc_env["PYTHONPATH"] = ":".join(sys.path)
+                paths = [str(path) for path in sys.path]
+                sub_proc_env["PYTHONPATH"] = ":".join(paths)
 
             try:
                 subprocess.check_output(
