@@ -8,8 +8,8 @@ Created on Oct 8, 2019
 """
 import sys
 import types
-from mock import MagicMock
 
+from mock import MagicMock
 
 _CHECK_OUTPUT_FAILS = False
 

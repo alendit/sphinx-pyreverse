@@ -8,8 +8,8 @@ First, Created on Oct 1, 2012, this file created on Oct 8, 2019
 
 import copy
 import os
-import sys
 import subprocess
+import sys
 
 from docutils import nodes
 from docutils.parsers.rst import directives

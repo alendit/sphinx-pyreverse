@@ -10,8 +10,8 @@ try:
     from io import StringIO
 except ImportError:
     # It's likely we're in python2 instead of python3
-    import sys
     import contextlib  # pylint: disable=ungrouped-imports
+    import sys
     from io import BytesIO as StringIO  # pylint: disable=ungrouped-imports
 
     @contextlib.contextmanager
@@ -28,15 +28,15 @@ except ImportError:
 
 import logging
 import os
-import unittest
 import shutil
 import tempfile
-
-import test.mock_subprocess
 import test.mock_pil
+import test.mock_subprocess
+import unittest
 from test.sphinx_test_util import MockState
 
 from mock import Mock
+
 import sphinx_pyreverse
 import sphinx_pyreverse.uml_generate_directive
 

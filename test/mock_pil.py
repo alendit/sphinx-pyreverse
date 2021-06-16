@@ -7,6 +7,7 @@ Created on Oct 8, 2019
 """
 import sys
 import types
+
 from mock import Mock
 
 PIL_MODULE_NAME = "PIL"
