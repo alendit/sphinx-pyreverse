@@ -16,6 +16,8 @@ from io import StringIO
 from test.sphinx_test_util import MockState
 from unittest import mock
 
+import pytest
+
 import sphinx_pyreverse
 import sphinx_pyreverse.uml_generate_directive
 
@@ -70,6 +72,10 @@ class CaptureLogger:
 
 class TestUMLGenerateDirectiveBase(unittest.TestCase):
     """A collection of tests for the UMLGenerateDirective object"""
+
+    @pytest.fixture(autouse=True)
+    def reset_state(self):
+        sphinx_pyreverse.UMLGenerateDirective.generated_modules = []
 
     def gen(self):
         """Constructs and returns a mocked UMLGenerateDirectiver instance"""
