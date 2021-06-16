@@ -32,6 +32,11 @@ except ImportError:  # pragma: no cover
 # ~ pass
 
 
+def subproc_wrapper(*args, **kwargs):
+    """A shim which allows mocking of the subproc call when using pytest"""
+    subprocess.check_output(*args, **kwargs)
+
+
 class UMLGenerateDirective(Directive):
     """UML directive to generate a pyreverse diagram"""
 
@@ -119,7 +124,7 @@ class UMLGenerateDirective(Directive):
                 sub_proc_env["PYTHONPATH"] = ":".join(sys.path)
 
             try:
-                subprocess.check_output(
+                subproc_wrapper(
                     cmd,
                     cwd=uml_dir,
                     env=sub_proc_env,  # use the calling-env for the subproc (paths etc)

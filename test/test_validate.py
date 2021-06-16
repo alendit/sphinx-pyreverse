@@ -8,15 +8,14 @@ Created on Oct 8, 2019
 import logging
 import os
 import shutil
+import subprocess
 import tempfile
 import test.mock_pil
-import test.mock_subprocess
 import unittest
-from contextlib import redirect_stdout
 from io import StringIO
 from test.sphinx_test_util import MockState
 
-from mock import Mock
+import mock
 
 import sphinx_pyreverse
 import sphinx_pyreverse.uml_generate_directive
@@ -37,7 +36,7 @@ class TempdirGuard(object):
         shutil.rmtree(self.path)  # always clean up on exit
 
 
-class CaptureLogger(object):
+class CaptureLogger:
     """Context manager to capture `logging` streams
 
     Args:
@@ -167,14 +166,19 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         instance = self.gen()
         for args in ((":classes:", ":packages:"), (":classes:",), (":packages:",)):
             instance.arguments = ["module_name"] + list(args)
-            instance.run()
+            with mock.patch(
+                "subprocess.check_output",
+            ):
+                instance.run()
 
     def test_generate_img(self):
         """cause UMLGenerateDirective.run() to call generate_image for all branches"""
         instance = self.gen()
 
         for width_under_test, expected_scale in ((0, 100), (1, 100), (2000, 50)):
-            with test.mock_pil.DimsUnderTestGuard(width=width_under_test):
+            with test.mock_pil.DimsUnderTestGuard(width=width_under_test), mock.patch(
+                "subprocess.check_output",
+            ):
                 mock_module = test.mock_pil.PIL_MOCK.Image  # pylint: disable=no-member
                 actual_width = mock_module.open("noexist").size[0]
                 self.assertEqual(actual_width, width_under_test)
@@ -195,7 +199,9 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
 
     def test_setup(self):
         """simply calls the setup function, ensuring no errors"""
-        self.assertEqual(sphinx_pyreverse.setup(Mock()), {"parallel_read_safe": True})
+        self.assertEqual(
+            sphinx_pyreverse.setup(mock.Mock()), {"parallel_read_safe": True}
+        )
 
     def test_non_default_options(self):
         """Simply calls run with non-default pyreverse options
@@ -259,35 +265,16 @@ class TestLogFixture(TestUMLGenerateDirectiveBase):
 
     def test_pyreverse_fails(self):
         """Test that we get output logging when the pyreverse fails"""
-        with test.mock_subprocess.FailExecuteGuard():
-            checking = test.mock_subprocess._CHECK_OUTPUT_FAILS  # pylint: disable=W0212
-            self.assertEqual(checking, True)
-            mock_module = test.mock_subprocess.SUBPROCESS_MOCK
-            func_mock = mock_module.check_output  # pylint: disable=no-member
-            func_mock.side_effect = test.mock_subprocess.CalledProcessError()
+        instance = self.gen()
 
-            instance = self.gen()
+        buf = StringIO()
+        with mock.patch.object(
+            sphinx_pyreverse.uml_generate_directive,
+            "subproc_wrapper",
+            side_effect=subprocess.CalledProcessError(returncode=999, cmd="test cmd"),
+        ), CaptureLogger(logging.getLogger(), buf):
+            with self.assertRaises(subprocess.CalledProcessError):
+                instance.run()
 
-            with StringIO() as buf, redirect_stdout(buf), CaptureLogger(
-                logging.getLogger(), buf
-            ):
-                with self.assertRaises(test.mock_subprocess.CalledProcessError):
-                    test.mock_subprocess.failing_call("")
-
-                # nothing should be logged to stdout or put to logs
-                self.assertEqual(buf.getvalue(), "")
-
-            with StringIO() as buf, redirect_stdout(buf), CaptureLogger(
-                logging.getLogger(), buf
-            ):
-                with self.assertRaises(test.mock_subprocess.CalledProcessError):
-                    instance.run()
-
-                expected_output = (
-                    "sphinx-pyreverse: Running: pyreverse --output png --project "
-                    "noexist_module noexist_module\n"
-                    "pyreverse-log: dummy output\n"
-                )
-
-                # nothing should be printed to stdout or the logger
-                self.assertEqual(buf.getvalue(), expected_output)
+        # nothing should be printed to stdout or the logger
+        self.assertEqual(buf.getvalue(), "")
