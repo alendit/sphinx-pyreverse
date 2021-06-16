@@ -42,11 +42,11 @@ setup(
         ],
         "tests": [
             "black==21.6b0",
-            "coverage",
             "docutils",
             "flake8",
             "isort==5.8.0",
-            "nose2",
+            "pytest",
+            "pytest-cov",
             "sphinx",
         ],
     },
