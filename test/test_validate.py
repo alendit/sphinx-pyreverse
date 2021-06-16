@@ -190,7 +190,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         os.mkdir(mock_dir)
         try:
             instance.run()
-        except FileNotFoundError as err:
+        except FileNotFoundError as err:  # pragma: no cover
             raise RuntimeError(
                 "sphinx_pyreverse should have created a single directory"
             ) from err

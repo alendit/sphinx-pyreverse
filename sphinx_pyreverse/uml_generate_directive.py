@@ -32,7 +32,7 @@ except ImportError:  # pragma: no cover
 # ~ pass
 
 
-def subproc_wrapper(*args, **kwargs):
+def subproc_wrapper(*args, **kwargs):  # pragma: no cover
     """A shim which allows mocking of the subproc call when using pytest"""
     subprocess.check_output(*args, **kwargs)
 
