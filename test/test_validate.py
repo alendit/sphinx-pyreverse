@@ -5,27 +5,6 @@ Created on Oct 8, 2019
 
 @author: doublethefish
 """
-try:
-    from contextlib import redirect_stdout
-    from io import StringIO
-except ImportError:
-    # It's likely we're in python2 instead of python3
-    import contextlib  # pylint: disable=ungrouped-imports
-    import sys
-    from io import BytesIO as StringIO  # pylint: disable=ungrouped-imports
-
-    @contextlib.contextmanager
-    def redirect_stdout(target):
-        """Mimics python3's redirect_stdout function"""
-        oldio = (sys.stdout, sys.stderr)
-        sys.stdout = target
-        sys.stderr = target
-        try:
-            yield
-        finally:
-            sys.stdout, sys.stderr = oldio
-
-
 import logging
 import os
 import shutil
@@ -33,6 +12,8 @@ import tempfile
 import test.mock_pil
 import test.mock_subprocess
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from test.sphinx_test_util import MockState
 
 from mock import Mock
@@ -42,7 +23,9 @@ import sphinx_pyreverse.uml_generate_directive
 
 
 class TempdirGuard(object):
-    """creates and deletes a tmp-dir compatible with python2 and 3"""
+    """creates and deletes a tmp-dir compatible with python2 and 3
+
+    TODO: move to pytest and use the tmpdir fixture"""
 
     def __init__(self):
         self.path = tempfile.mkdtemp(prefix="sphinx_pyreverse_test")
