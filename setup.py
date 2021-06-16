@@ -5,11 +5,12 @@ Created on Oct 2, 2012
 @author: alendit
 """
 import os
+
 from setuptools import setup
 
 
 def read(fname):
-    """ Reads a file in from disk and returns its contents """
+    """Reads a file in from disk and returns its contents"""
     with open(os.path.join(os.path.dirname(__file__), fname), "r") as file_handle:
         return file_handle.read()
 
@@ -40,11 +41,12 @@ setup(
             "pillow",
         ],
         "tests": [
-            "coverage",
+            "black==21.6b0",
             "docutils",
             "flake8",
-            "mock",
-            "nose2",
+            "isort==5.8.0",
+            "pytest",
+            "pytest-cov",
             "sphinx",
         ],
     },

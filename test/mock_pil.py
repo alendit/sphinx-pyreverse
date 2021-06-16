@@ -7,7 +7,7 @@ Created on Oct 8, 2019
 """
 import sys
 import types
-from mock import Mock
+from unittest.mock import Mock
 
 PIL_MODULE_NAME = "PIL"
 PIL_MOCK = types.ModuleType(PIL_MODULE_NAME)
@@ -17,7 +17,7 @@ _DIMS_UNDER_TEST = (0, 0)
 
 
 class DimsUnderTestGuard(object):
-    """ Changes the width to use in tests """
+    """Changes the width to use in tests"""
 
     def __init__(self, width=0, height=0):
         self._prev = None
@@ -40,10 +40,10 @@ class DimsUnderTestGuard(object):
 
 
 def _open(_):
-    """ returns a dummy image with a size paramter """
+    """returns a dummy image with a size paramter"""
 
     class MockImage(object):
-        """ A MockImage with a mock size """
+        """A MockImage with a mock size"""
 
         __slots__ = ("size",)
 

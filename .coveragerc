@@ -1,7 +1,13 @@
 # .coveragerc to control coverage.py
 [run]
 branch = True
-source = sphinx_pyreverse
+source = sphinx_pyreverse/
+
+# Exclude any pyenvs
+omit =
+    *env*/*
+    setup.py
+
 
 [report]
 # Regexes for lines to exclude from consideration

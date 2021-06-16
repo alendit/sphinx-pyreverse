@@ -8,8 +8,8 @@ First, Created on Oct 1, 2012, this file created on Oct 8, 2019
 
 import copy
 import os
-import sys
 import subprocess
+import sys
 
 from docutils import nodes
 from docutils.parsers.rst import directives
@@ -32,6 +32,11 @@ except ImportError:  # pragma: no cover
 # ~ pass
 
 
+def subproc_wrapper(*args, **kwargs):  # pragma: no cover
+    """A shim which allows mocking of the subproc call when using pytest"""
+    subprocess.check_output(*args, **kwargs)
+
+
 class UMLGenerateDirective(Directive):
     """UML directive to generate a pyreverse diagram"""
 
@@ -43,7 +48,7 @@ class UMLGenerateDirective(Directive):
     generated_modules = []
 
     def _validate(self):
-        """ Validates that the RST parameters are valid """
+        """Validates that the RST parameters are valid"""
         valid_flags = {":classes:", ":packages:"}
         unkown_arguments = set(self.arguments[1:]) - valid_flags
         if unkown_arguments:
@@ -111,15 +116,15 @@ class UMLGenerateDirective(Directive):
             )
 
             # Ensure we have the right paths available to the pyreverse subproc
-            if "PYTHONPATH" in os.environ:  # pragma: no cover
-                sub_proc_env = os.environ
+            if "PYTHONPATH" in os.environ:
+                sub_proc_env = copy.deepcopy(os.environ)
             else:
                 sub_proc_env = copy.deepcopy(os.environ)
                 # TODO: check this is ok on windows etc.
                 sub_proc_env["PYTHONPATH"] = ":".join(sys.path)
 
             try:
-                subprocess.check_output(
+                subproc_wrapper(
                     cmd,
                     cwd=uml_dir,
                     env=sub_proc_env,  # use the calling-env for the subproc (paths etc)
@@ -144,7 +149,7 @@ class UMLGenerateDirective(Directive):
         return res
 
     def generate_img(self, img_name, module_name, base_dir, src_dir, config):
-        """ Resizes the image and returns a Sphinx image """
+        """Resizes the image and returns a Sphinx image"""
         path_from_base = os.path.join(self.DIR_NAME, "{1}_{0}.{2}").format(
             module_name, img_name, config.sphinx_pyreverse_output
         )

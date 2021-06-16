@@ -53,9 +53,7 @@ if [ -d dist ]; then
 	mv dist/* "$BACKUP_DIR"
 fi
 
-# Create Python2 and Python3 variants
 python3 setup.py sdist bdist_wheel | sed 's/^/py3: /'
-python2 setup.py sdist bdist_wheel | sed 's/^/py2: /'
 
 python3 -m twine upload --verbose --repository-url "$PIP_REPOSITORY" dist/* | sed 's/^/upload: /'
 EXIT_CODE=$?
