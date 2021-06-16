@@ -76,6 +76,13 @@ class TestUMLGenerateDirectiveBase:
     def reset_state(self):
         sphinx_pyreverse.UMLGenerateDirective.generated_modules = []
 
+    @pytest.fixture(autouse=True)
+    def mocksub(self):
+        with mock.patch.object(
+            sphinx_pyreverse.uml_generate_directive, "subproc_wrapper"
+        ) as mocksub:
+            yield mocksub
+
     def gen(self):
         """Constructs and returns a mocked UMLGenerateDirectiver instance"""
 
