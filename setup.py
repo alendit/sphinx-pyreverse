@@ -46,7 +46,6 @@ setup(
             "docutils",
             "flake8",
             "isort==5.8.0",
-            "mock",
             "nose2",
             "sphinx",
         ],

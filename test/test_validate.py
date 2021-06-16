@@ -14,8 +14,7 @@ import test.mock_pil
 import unittest
 from io import StringIO
 from test.sphinx_test_util import MockState
-
-import mock
+from unittest import mock
 
 import sphinx_pyreverse
 import sphinx_pyreverse.uml_generate_directive
