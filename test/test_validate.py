@@ -7,9 +7,7 @@ Created on Oct 8, 2019
 """
 import logging
 import os
-import shutil
 import subprocess
-import tempfile
 import test.mock_pil
 from io import StringIO
 from test.sphinx_test_util import MockState
@@ -19,21 +17,6 @@ import pytest
 
 import sphinx_pyreverse
 import sphinx_pyreverse.uml_generate_directive
-
-
-class TempdirGuard:
-    """creates and deletes a tmp-dir compatible with python2 and 3
-
-    TODO: move to pytest and use the tmpdir fixture"""
-
-    def __init__(self):
-        self.path = tempfile.mkdtemp(prefix="sphinx_pyreverse_test")
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, x_type, x_value, x_traceback):
-        shutil.rmtree(self.path)  # always clean up on exit
 
 
 class CaptureLogger:
@@ -114,7 +97,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         instance = self.gen()
         instance.run()
 
-    def test_uml_dir_creation(self):
+    def test_uml_dir_creation(self, tmpdir):
         """test that the uml directory is created under the right circumstances
 
         This just captures current behaviour - there should be no problem changing it.
@@ -128,33 +111,27 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
                 OSError
             )
         instance = self.gen()
-        with TempdirGuard() as tempdir:
-            mock_dir = os.path.join(tempdir.path, "noexist.dir")
-            instance.state.document.settings.env.srcdir = mock_dir
+        mock_dir = tmpdir / "noexist.dir"
+        instance.state.document.settings.env.srcdir = mock_dir
+
+        # Check that sphinx_pyreverse doesn't create all the directories.
+        with pytest.raises(FileNotFoundError):
             instance.run()
-            assert os.path.exists(tempdir.path)
-            assert os.path.exists(mock_dir)
+        assert tmpdir.exists()
+        assert not mock_dir.exists()
 
-            # Check that spinhx_pyreverse doesn't create all the directories.
-            with pytest.raises(
-                FileNotFoundError, msg="sphinx_pyreverse should not call mdkir -p"
-            ):
-                instance.run()
+        assert not os.path.exists(mock_dir)
 
-            assert not os.path.exists(mock_dir)
-
-            # Now make the parent dir, sphinx_pyreverse should create everything below
-            # that, to a single depth
-            os.mkdir(mock_dir)
-            try:
-                instance.run()
-            except FileNotFoundError:
-                error = RuntimeError(
-                    "sphinx_pyreverse should have created a single directory"
-                )
-                # As we currently support python2, ignore py3 specific re-raise syntax
-                raise error  # pylint: disable=W0707
-            assert os.path.exists(mock_dir)
+        # Now make the parent dir, sphinx_pyreverse should create everything below
+        # that, to a single depth
+        os.mkdir(mock_dir)
+        try:
+            instance.run()
+        except FileNotFoundError as err:
+            raise RuntimeError(
+                "sphinx_pyreverse should have created a single directory"
+            ) from err
+        assert os.path.exists(mock_dir)
 
     def test_generate_same_twice(self):
         """check that there are no side-effects of processing the same module twice"""
