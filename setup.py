@@ -51,7 +51,7 @@ setup(
         ],
     },
     install_requires=[
-        "astroid<=2.4.2",
+        "astroid>=2.5.7",
         "docutils",
         "pylint",  # for `pyreverse`
         "sphinx",
