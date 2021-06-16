@@ -116,8 +116,8 @@ class UMLGenerateDirective(Directive):
             )
 
             # Ensure we have the right paths available to the pyreverse subproc
-            if "PYTHONPATH" in os.environ:  # pragma: no cover
-                sub_proc_env = os.environ
+            if "PYTHONPATH" in os.environ:
+                sub_proc_env = copy.deepcopy(os.environ)
             else:
                 sub_proc_env = copy.deepcopy(os.environ)
                 # TODO: check this is ok on windows etc.

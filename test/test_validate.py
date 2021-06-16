@@ -8,6 +8,7 @@ Created on Oct 8, 2019
 import logging
 import os
 import subprocess
+import sys
 import test.mock_pil
 from io import StringIO
 from test.sphinx_test_util import MockState
@@ -92,10 +93,72 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         instance = self.gen()
         assert instance is not None
 
-    def test_run(self):
+    def test_run(self, mocksub):
         """simply invokes run with the default setup parameters"""
         instance = self.gen()
-        instance.run()
+        assert not instance.generated_modules
+        with mock.patch.dict(
+            os.environ, {"TEST ENV VARIABLE": "test value"}, clear=True
+        ):
+            instance.run()
+        assert mocksub.call_count == 1
+        called_with = mocksub.call_args_list
+        assert called_with[0][0][0] == [
+            "pyreverse",
+            "--output",
+            "png",
+            "--project",
+            "noexist_module",
+            "noexist_module",
+        ], "have the default args for pyreverse changed?"
+
+        # check that the env is modified so the pyreverse step is able to find
+        # the module it want to diagram
+        keyword_args = called_with[0][1]
+        assert (
+            "TEST ENV VARIABLE" in keyword_args["env"]
+        ), "We expect the env to be preserved"
+        assert (
+            "PYTHONPATH" in keyword_args["env"]
+        ), "We expect PYTHONPATH to have been added"
+        assert keyword_args["env"] == {
+            "PYTHONPATH": ":".join(sys.path),
+            "TEST ENV VARIABLE": "test value",
+        }
+
+    def test_run_with_pythonpath_set(self, mocksub):
+        """invokes run with the env var PYTHONPATH set"""
+        instance = self.gen()
+        with mock.patch.dict(
+            os.environ,
+            {"TEST ENV VARIABLE": "test value", "PYTHONPATH": "test path"},
+            clear=True,
+        ):
+            instance.run()
+        assert mocksub.call_count == 1
+        called_with = mocksub.call_args_list
+        assert called_with[0][0][0] == [
+            "pyreverse",
+            "--output",
+            "png",
+            "--project",
+            "noexist_module",
+            "noexist_module",
+        ], "have the default args for pyreverse changed?"
+
+        # check that the env is NOT modified so the pyreverse step is able to find
+        # the module it want to diagram
+        keyword_args = called_with[0][1]
+        assert (
+            "PYTHONPATH" in keyword_args["env"]
+        ), "We expect also expect PYTHONPATH to have been preserved"
+        assert keyword_args["env"] == {
+            "PYTHONPATH": "test path",
+            "TEST ENV VARIABLE": "test value",
+        }
+        assert (
+            "TEST ENV VARIABLE" in keyword_args["env"]
+        ), "We expect the env to be preserved"
 
     def test_uml_dir_creation(self, tmpdir):
         """test that the uml directory is created under the right circumstances
