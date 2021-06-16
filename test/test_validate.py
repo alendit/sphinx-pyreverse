@@ -11,7 +11,6 @@ import shutil
 import subprocess
 import tempfile
 import test.mock_pil
-import unittest
 from io import StringIO
 from test.sphinx_test_util import MockState
 from unittest import mock
@@ -22,7 +21,7 @@ import sphinx_pyreverse
 import sphinx_pyreverse.uml_generate_directive
 
 
-class TempdirGuard(object):
+class TempdirGuard:
     """creates and deletes a tmp-dir compatible with python2 and 3
 
     TODO: move to pytest and use the tmpdir fixture"""
@@ -70,7 +69,7 @@ class CaptureLogger:
         self.logger.level = self.old_level
 
 
-class TestUMLGenerateDirectiveBase(unittest.TestCase):
+class TestUMLGenerateDirectiveBase:
     """A collection of tests for the UMLGenerateDirective object"""
 
     @pytest.fixture(autouse=True)
@@ -101,7 +100,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
     def test_ctor(self):
         """simply constructs a UMLGenerateDirectiver instance with mock values"""
         instance = self.gen()
-        self.assertIsNotNone(instance)
+        assert instance is not None
 
     def test_run(self):
         """simply invokes run with the default setup parameters"""
@@ -125,16 +124,17 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         with TempdirGuard() as tempdir:
             mock_dir = os.path.join(tempdir.path, "noexist.dir")
             instance.state.document.settings.env.srcdir = mock_dir
-            self.assertTrue(os.path.exists(tempdir.path))
-            self.assertFalse(os.path.exists(mock_dir))
+            instance.run()
+            assert os.path.exists(tempdir.path)
+            assert os.path.exists(mock_dir)
 
             # Check that spinhx_pyreverse doesn't create all the directories.
-            with self.assertRaises(
+            with pytest.raises(
                 FileNotFoundError, msg="sphinx_pyreverse should not call mdkir -p"
             ):
                 instance.run()
 
-            self.assertFalse(os.path.exists(mock_dir))
+            assert not os.path.exists(mock_dir)
 
             # Now make the parent dir, sphinx_pyreverse should create everything below
             # that, to a single depth
@@ -147,7 +147,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
                 )
                 # As we currently support python2, ignore py3 specific re-raise syntax
                 raise error  # pylint: disable=W0707
-            self.assertTrue(os.path.exists(mock_dir))
+            assert os.path.exists(mock_dir)
 
     def test_generate_same_twice(self):
         """check that there are no side-effects of processing the same module twice"""
@@ -164,7 +164,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         try:
             instance.run()
         except ValueError as exception:
-            self.assertTrue("invalid flags encountered" in str(exception))
+            assert "invalid flags encountered" in str(exception)
 
     def test_valid_flags(self):
         """ensure we accept the currently know valid-flags for pyreverse"""
@@ -186,10 +186,10 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
             ):
                 mock_module = test.mock_pil.PIL_MOCK.Image  # pylint: disable=no-member
                 actual_width = mock_module.open("noexist").size[0]
-                self.assertEqual(actual_width, width_under_test)
+                assert actual_width == width_under_test
                 res = instance.run()
-                self.assertEqual(
-                    res[0]["scale"], expected_scale, "Failed for %d" % width_under_test
+                assert res[0]["scale"] == expected_scale, (
+                    "Failed for %d" % width_under_test
                 )
 
     def test_generate_img_no_pil(self):
@@ -204,9 +204,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
 
     def test_setup(self):
         """simply calls the setup function, ensuring no errors"""
-        self.assertEqual(
-            sphinx_pyreverse.setup(mock.Mock()), {"parallel_read_safe": True}
-        )
+        assert sphinx_pyreverse.setup(mock.Mock()) == {"parallel_read_safe": True}
 
     def test_non_default_options(self):
         """Simply calls run with non-default pyreverse options
@@ -218,17 +216,17 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
 
         instance = self.gen()
 
-        self.assertEqual(config.sphinx_pyreverse_output, "png")
-        self.assertEqual(config.sphinx_pyreverse_filter_mode, None)
-        self.assertEqual(config.sphinx_pyreverse_class, None)
-        self.assertEqual(config.sphinx_pyreverse_show_ancestors, None)
-        self.assertEqual(config.sphinx_pyreverse_all_ancestors, None)
-        self.assertEqual(config.sphinx_pyreverse_show_associated, None)
-        self.assertEqual(config.sphinx_pyreverse_all_associated, None)
-        self.assertEqual(config.sphinx_pyreverse_show_builtin, None)
-        self.assertEqual(config.sphinx_pyreverse_module_names, None)
-        self.assertEqual(config.sphinx_pyreverse_only_classnames, None)
-        self.assertEqual(config.sphinx_pyreverse_ignore, None)
+        assert config.sphinx_pyreverse_output == "png"
+        assert config.sphinx_pyreverse_filter_mode is None
+        assert config.sphinx_pyreverse_class is None
+        assert config.sphinx_pyreverse_show_ancestors is None
+        assert config.sphinx_pyreverse_all_ancestors is None
+        assert config.sphinx_pyreverse_show_associated is None
+        assert config.sphinx_pyreverse_all_associated is None
+        assert config.sphinx_pyreverse_show_builtin is None
+        assert config.sphinx_pyreverse_module_names is None
+        assert config.sphinx_pyreverse_only_classnames is None
+        assert config.sphinx_pyreverse_ignore is None
 
         # Set the config to non-default values
         config.sphinx_pyreverse_output = "dot"
@@ -242,16 +240,16 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         config.sphinx_pyreverse_module_names = "y"
         config.sphinx_pyreverse_ignore = "noexist.py,secondnoeexist.py"
 
-        self.assertEqual(config.sphinx_pyreverse_output, "dot")
-        self.assertEqual(config.sphinx_pyreverse_filter_mode, "ALL")
-        self.assertEqual(config.sphinx_pyreverse_class, "invalid-class")
-        self.assertEqual(config.sphinx_pyreverse_show_ancestors, "invalid-class")
-        self.assertEqual(config.sphinx_pyreverse_all_ancestors, True)
-        self.assertEqual(config.sphinx_pyreverse_show_associated, 100)
-        self.assertEqual(config.sphinx_pyreverse_all_associated, True)
-        self.assertEqual(config.sphinx_pyreverse_show_builtin, True)
-        self.assertEqual(config.sphinx_pyreverse_module_names, "y")
-        self.assertEqual(config.sphinx_pyreverse_ignore, "noexist.py,secondnoeexist.py")
+        assert config.sphinx_pyreverse_output == "dot"
+        assert config.sphinx_pyreverse_filter_mode == "ALL"
+        assert config.sphinx_pyreverse_class == "invalid-class"
+        assert config.sphinx_pyreverse_show_ancestors == "invalid-class"
+        assert config.sphinx_pyreverse_all_ancestors
+        assert config.sphinx_pyreverse_show_associated == 100
+        assert config.sphinx_pyreverse_all_associated
+        assert config.sphinx_pyreverse_show_builtin
+        assert config.sphinx_pyreverse_module_names == "y"
+        assert config.sphinx_pyreverse_ignore == "noexist.py,secondnoeexist.py"
 
         instance._build_command(  # pylint: disable=protected-access
             "test_module", config=config
@@ -259,7 +257,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
 
         # disables --filter option, so run separately
         config.sphinx_pyreverse_only_classnames = True
-        self.assertEqual(config.sphinx_pyreverse_only_classnames, True)
+        assert config.sphinx_pyreverse_only_classnames
         instance._build_command(  # pylint: disable=protected-access
             "test_module", config=config
         )
@@ -278,8 +276,8 @@ class TestLogFixture(TestUMLGenerateDirectiveBase):
             "subproc_wrapper",
             side_effect=subprocess.CalledProcessError(returncode=999, cmd="test cmd"),
         ), CaptureLogger(logging.getLogger(), buf):
-            with self.assertRaises(subprocess.CalledProcessError):
+            with pytest.raises(subprocess.CalledProcessError):
                 instance.run()
 
         # nothing should be printed to stdout or the logger
-        self.assertEqual(buf.getvalue(), "")
+        assert buf.getvalue() == ""
