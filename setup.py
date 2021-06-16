@@ -40,6 +40,7 @@ setup(
             "pillow",
         ],
         "tests": [
+            "black==21.6b0",
             "coverage",
             "docutils",
             "flake8",
