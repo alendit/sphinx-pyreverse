@@ -43,7 +43,7 @@ class UMLGenerateDirective(Directive):
     generated_modules = []
 
     def _validate(self):
-        """ Validates that the RST parameters are valid """
+        """Validates that the RST parameters are valid"""
         valid_flags = {":classes:", ":packages:"}
         unkown_arguments = set(self.arguments[1:]) - valid_flags
         if unkown_arguments:
@@ -144,7 +144,7 @@ class UMLGenerateDirective(Directive):
         return res
 
     def generate_img(self, img_name, module_name, base_dir, src_dir, config):
-        """ Resizes the image and returns a Sphinx image """
+        """Resizes the image and returns a Sphinx image"""
         path_from_base = os.path.join(self.DIR_NAME, "{1}_{0}.{2}").format(
             module_name, img_name, config.sphinx_pyreverse_output
         )

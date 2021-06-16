@@ -16,7 +16,7 @@ except ImportError:
 
     @contextlib.contextmanager
     def redirect_stdout(target):
-        """ Mimics python3's redirect_stdout function """
+        """Mimics python3's redirect_stdout function"""
         oldio = (sys.stdout, sys.stderr)
         sys.stdout = target
         sys.stderr = target
@@ -42,7 +42,7 @@ import sphinx_pyreverse.uml_generate_directive
 
 
 class TempdirGuard(object):
-    """ creates and deletes a tmp-dir compatible with python2 and 3 """
+    """creates and deletes a tmp-dir compatible with python2 and 3"""
 
     def __init__(self):
         self.path = tempfile.mkdtemp(prefix="sphinx_pyreverse_test")
@@ -88,10 +88,10 @@ class CaptureLogger(object):
 
 
 class TestUMLGenerateDirectiveBase(unittest.TestCase):
-    """ A collection of tests for the UMLGenerateDirective object """
+    """A collection of tests for the UMLGenerateDirective object"""
 
     def gen(self):
-        """ Constructs and returns a mocked UMLGenerateDirectiver instance """
+        """Constructs and returns a mocked UMLGenerateDirectiver instance"""
 
         state = MockState()
 
@@ -109,15 +109,15 @@ class TestUMLGenerateDirectiveBase(unittest.TestCase):
 
 
 class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
-    """ A collection of tests for the UMLGenerateDirective object """
+    """A collection of tests for the UMLGenerateDirective object"""
 
     def test_ctor(self):
-        """ simply constructs a UMLGenerateDirectiver instance with mock values """
+        """simply constructs a UMLGenerateDirectiver instance with mock values"""
         instance = self.gen()
         self.assertIsNotNone(instance)
 
     def test_run(self):
-        """ simply invokes run with the default setup parameters """
+        """simply invokes run with the default setup parameters"""
         instance = self.gen()
         instance.run()
 
@@ -163,7 +163,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
             self.assertTrue(os.path.exists(mock_dir))
 
     def test_generate_same_twice(self):
-        """ check that there are no side-effects of processing the same module twice """
+        """check that there are no side-effects of processing the same module twice"""
         instance = self.gen()
         instance.run()
         instance.run()
@@ -171,7 +171,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         # was called (should only be once)
 
     def test_invalid_flags(self):
-        """ test graceful handling & reporting of errors in parameters """
+        """test graceful handling & reporting of errors in parameters"""
         instance = self.gen()
         instance.arguments = ["module_name", ":bad_arg:"]
         try:
@@ -180,14 +180,14 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
             self.assertTrue("invalid flags encountered" in str(exception))
 
     def test_valid_flags(self):
-        """ ensure we accept the currently know valid-flags for pyreverse """
+        """ensure we accept the currently know valid-flags for pyreverse"""
         instance = self.gen()
         for args in ((":classes:", ":packages:"), (":classes:",), (":packages:",)):
             instance.arguments = ["module_name"] + list(args)
             instance.run()
 
     def test_generate_img(self):
-        """ cause UMLGenerateDirective.run() to call generate_image for all branches """
+        """cause UMLGenerateDirective.run() to call generate_image for all branches"""
         instance = self.gen()
 
         for width_under_test, expected_scale in ((0, 100), (1, 100), (2000, 50)):
@@ -211,7 +211,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         sphinx_pyreverse.uml_generate_directive.IMAGE = old_image
 
     def test_setup(self):
-        """ simply calls the setup function, ensuring no errors """
+        """simply calls the setup function, ensuring no errors"""
         self.assertEqual(sphinx_pyreverse.setup(Mock()), {"parallel_read_safe": True})
 
     def test_non_default_options(self):
@@ -272,10 +272,10 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
 
 
 class TestLogFixture(TestUMLGenerateDirectiveBase):
-    """ Test logging related aspects of the plugin by capturing output """
+    """Test logging related aspects of the plugin by capturing output"""
 
     def test_pyreverse_fails(self):
-        """ Test that we get output logging when the pyreverse fails """
+        """Test that we get output logging when the pyreverse fails"""
         with test.mock_subprocess.FailExecuteGuard():
             checking = test.mock_subprocess._CHECK_OUTPUT_FAILS  # pylint: disable=W0212
             self.assertEqual(checking, True)

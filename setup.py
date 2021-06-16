@@ -9,7 +9,7 @@ from setuptools import setup
 
 
 def read(fname):
-    """ Reads a file in from disk and returns its contents """
+    """Reads a file in from disk and returns its contents"""
     with open(os.path.join(os.path.dirname(__file__), fname), "r") as file_handle:
         return file_handle.read()
 

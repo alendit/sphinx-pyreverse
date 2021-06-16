@@ -15,7 +15,7 @@ _CHECK_OUTPUT_FAILS = False
 
 
 class FailExecuteGuard(object):
-    """ When in scope, causes the subprocess mock to fail """
+    """When in scope, causes the subprocess mock to fail"""
 
     def __init__(self):
         self.prev = None
@@ -36,7 +36,7 @@ class FailExecuteGuard(object):
 
 
 class CalledProcessError(Exception):
-    """ Mock the exception thrown by subprocess """
+    """Mock the exception thrown by subprocess"""
 
     def __init__(self):
         super(CalledProcessError, self).__init__()  # pylint: disable=R1725
