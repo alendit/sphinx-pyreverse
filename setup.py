@@ -17,7 +17,7 @@ def read(fname):
 
 setup(
     name="sphinx-pyreverse",
-    version="0.0.16",
+    version="0.0.17",
     author="Dimitri Vorona",
     author_email="vorona@in.tum.de",
     classifiers=[
