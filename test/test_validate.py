@@ -328,3 +328,37 @@ class TestLogFixture(TestUMLGenerateDirectiveBase):
 
         # nothing should be printed to stdout or the logger
         assert buf.getvalue() == ""
+
+
+@pytest.mark.parametrize(
+    "module_address",
+    ["parent_only", "parent.submodule", "parent.submodule.nestedsubmodule"],
+)
+def test_module_paths(module_address):
+    state = MockState()
+
+    obj = sphinx_pyreverse.UMLGenerateDirective(
+        name="test",
+        arguments=[module_address, ":classes:", ":packages:"],
+        options=None,
+        content=None,
+        lineno=None,
+        content_offset=None,
+        block_text=None,
+        state=state,
+        state_machine=None,
+    )
+
+    doc = obj.state.document
+    env = doc.settings.env
+
+    uri, output_file = obj.get_paths(
+        img_name="IMG_NAME",
+        module_name=module_address,
+        base_dir="BASE_DIR/",
+        src_dir="SRC_DIR/",
+        config=env.config,
+    )
+
+    assert uri == f"../BASE_DIR/uml_images/IMG_NAME_{module_address}.png"
+    assert output_file == f"BASE_DIR/uml_images/IMG_NAME_{module_address}.png"

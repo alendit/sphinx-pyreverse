@@ -148,18 +148,25 @@ class UMLGenerateDirective(Directive):
 
         return res
 
-    def generate_img(self, img_name, module_name, base_dir, src_dir, config):
-        """Resizes the image and returns a Sphinx image"""
+    def get_paths(self, img_name, module_name, base_dir, src_dir, config):
         path_from_base = os.path.join(self.DIR_NAME, "{1}_{0}.{2}").format(
             module_name, img_name, config.sphinx_pyreverse_output
         )
         # use relpath to get sub-directory of the main 'source' location
         src_base = os.path.relpath(base_dir, start=src_dir)
         uri = directives.uri(os.path.join(src_base, path_from_base))
+        output_file = os.path.join(base_dir, path_from_base)
+        return (uri, output_file)
+
+    def generate_img(self, img_name, module_name, base_dir, src_dir, config):
+        """Resizes the image and returns a Sphinx image"""
+        (uri, output_file) = self.get_paths(
+            img_name, module_name, base_dir, src_dir, config
+        )
         scale = 100
         max_width = 1000
         if IMAGE:
-            i = IMAGE.open(os.path.join(base_dir, path_from_base))
+            i = IMAGE.open(output_file)
             image_width = i.size[0]
             if image_width > max_width:
                 scale = max_width * scale / image_width
