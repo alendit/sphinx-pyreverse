@@ -53,3 +53,19 @@ Changing the directive
 
 To override the directive, which defaults to 'uml' set the
 ``SPHINX_PYREVERSE_DIRECTIVE`` environment variable to whatever you like.
+
+Troubleshooting
+^^^^^^^^^^^^^^^
+
+``sphinx-pyreverse`` uses sphinx-docs' logging api to write information to the log-files.
+
+To use it run your ``sphinx-build`` command with ``-v -v -v -w $(pwd)/sphinx.log`` .
+
+For more information see:
+
+  * `-v switch`_ 
+  * `-w switch`_ 
+
+
+.. _-v switch: https://www.sphinx-doc.org/en/master/man/sphinx-build.html#cmdoption-sphinx-build-v
+.. _-w switch: https://www.sphinx-doc.org/en/master/man/sphinx-build.html#cmdoption-sphinx-build-w

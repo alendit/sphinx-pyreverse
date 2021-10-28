@@ -53,8 +53,9 @@ class UMLGenerateDirective(Directive):
         unkown_arguments = set(self.arguments[1:]) - valid_flags
         if unkown_arguments:
             raise ValueError(
-                "invalid flags encountered: {0}. Must be one of {1}".format(
-                    unkown_arguments, valid_flags
+                (
+                    f"invalid flags encountered: {unkown_arguments}. "
+                    f"Must be one of {valid_flags}"
                 )
             )
 
@@ -112,7 +113,7 @@ class UMLGenerateDirective(Directive):
         if module_name not in self.generated_modules:
             cmd = self._build_command(module_name, env.config)
             logging.getLogger(__name__).info(
-                "sphinx-pyreverse: Running: {cmd}".format(cmd=" ".join(cmd))
+                f"sphinx-pyreverse: Running: {' '.join(cmd)}"
             )
 
             # Ensure we have the right paths available to the pyreverse subproc
@@ -131,9 +132,7 @@ class UMLGenerateDirective(Directive):
                 )
             except subprocess.CalledProcessError as error:
                 for line in str(error.output).split("\\n"):
-                    logging.getLogger(__name__).info(
-                        "pyreverse-log: {line}".format(line=line)
-                    )
+                    logging.getLogger(__name__).info(f"pyreverse-log: {line}")
                 raise
 
             # avoid double-generating

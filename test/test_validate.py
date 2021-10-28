@@ -235,9 +235,9 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
                 actual_width = mock_module.open("noexist").size[0]
                 assert actual_width == width_under_test
                 res = instance.run()
-                assert res[0]["scale"] == expected_scale, (
-                    "Failed for %d" % width_under_test
-                )
+                assert (
+                    res[0]["scale"] == expected_scale
+                ), f"Failed for {width_under_test}"
 
     def test_generate_img_no_pil(self):
         """ensure we handle not have the PIL library gracefully
