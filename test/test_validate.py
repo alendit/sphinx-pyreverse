@@ -274,6 +274,8 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         assert config.sphinx_pyreverse_module_names is None
         assert config.sphinx_pyreverse_only_classnames is None
         assert config.sphinx_pyreverse_ignore is None
+        assert config.sphinx_pyreverse_image_max_width == 1000
+        assert config.sphinx_pyreverse_image_scale == 1
 
         # Set the config to non-default values
         config.sphinx_pyreverse_output = "dot"
@@ -286,6 +288,8 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         config.sphinx_pyreverse_show_builtin = True
         config.sphinx_pyreverse_module_names = "y"
         config.sphinx_pyreverse_ignore = "noexist.py,secondnoeexist.py"
+        config.sphinx_pyreverse_image_max_width = 1500
+        config.sphinx_pyreverse_image_scale = 2
 
         assert config.sphinx_pyreverse_output == "dot"
         assert config.sphinx_pyreverse_filter_mode == "ALL"
@@ -297,6 +301,8 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         assert config.sphinx_pyreverse_show_builtin
         assert config.sphinx_pyreverse_module_names == "y"
         assert config.sphinx_pyreverse_ignore == "noexist.py,secondnoeexist.py"
+        assert config.sphinx_pyreverse_image_max_width == 1500
+        assert config.sphinx_pyreverse_image_scale == 2
 
         instance._build_command(  # pylint: disable=protected-access
             "test_module", config=config
