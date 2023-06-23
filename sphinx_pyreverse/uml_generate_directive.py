@@ -50,11 +50,11 @@ class UMLGenerateDirective(Directive):
     def _validate(self):
         """Validates that the RST parameters are valid"""
         valid_flags = {":classes:", ":packages:"}
-        unkown_arguments = set(self.arguments[1:]) - valid_flags
-        if unkown_arguments:
+        unknown_arguments = set(self.arguments[1:]) - valid_flags
+        if unknown_arguments:
             raise ValueError(
                 (
-                    f"invalid flags encountered: {unkown_arguments}. "
+                    f"invalid flags encountered: {unknown_arguments}. "
                     f"Must be one of {valid_flags}"
                 )
             )

@@ -1,5 +1,5 @@
 """
-Defines mocks objects mimicing sphinx applications state for tests
+Defines mocks objects mimicking sphinx applications state for tests
 
 Created on 22, 2020
 

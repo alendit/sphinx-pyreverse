@@ -68,7 +68,7 @@ class TestUMLGenerateDirectiveBase:
             yield mocksub
 
     def gen(self):
-        """Constructs and returns a mocked UMLGenerateDirectiver instance"""
+        """Constructs and returns a mocked UMLGenerateDirective instance"""
 
         state = MockState()
 
@@ -89,7 +89,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
     """A collection of tests for the UMLGenerateDirective object"""
 
     def test_ctor(self):
-        """simply constructs a UMLGenerateDirectiver instance with mock values"""
+        """simply constructs a UMLGenerateDirective instance with mock values"""
         instance = self.gen()
         assert instance is not None
 
@@ -201,7 +201,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         instance = self.gen()
         instance.run()
         instance.run()
-        # TODO: extend the subprocess mock so we can interegate how many times pyreverse
+        # TODO: extend the subprocess mock so we can interrogate how many times pyreverse
         # was called (should only be once)
 
     def test_invalid_flags(self):
