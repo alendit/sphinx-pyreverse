@@ -11,6 +11,7 @@ import subprocess
 import sys
 import test.mock_pil
 from io import StringIO
+from pathlib import Path
 from test.sphinx_test_util import MockState
 from unittest import mock
 
@@ -165,14 +166,6 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
 
         This just captures current behaviour - there should be no problem changing it.
         """
-        try:
-            FileNotFoundError  # noqa: F823
-        except NameError:
-            # In python2 we need to define this built-in, but must ignore it on
-            # python3's flake8
-            FileNotFoundError = (  # noqa: F823,E501 pylint: disable=redefined-builtin,invalid-name
-                OSError
-            )
         instance = self.gen()
         mock_dir = tmpdir / "noexist.dir"
         instance.state.document.settings.env.srcdir = mock_dir
@@ -355,10 +348,10 @@ def test_module_paths(module_address):
     uri, output_file = obj.get_paths(
         img_name="IMG_NAME",
         module_name=module_address,
-        base_dir="BASE_DIR/",
-        src_dir="SRC_DIR/",
+        base_dir=Path("BASE_DIR/"),
+        src_dir=Path("SRC_DIR/"),
         config=env.config,
     )
 
-    assert uri == f"../BASE_DIR/uml_images/IMG_NAME_{module_address}.png"
-    assert output_file == f"BASE_DIR/uml_images/IMG_NAME_{module_address}.png"
+    assert uri == Path(f"../BASE_DIR/uml_images/IMG_NAME_{module_address}.png")
+    assert output_file == Path(f"BASE_DIR/uml_images/IMG_NAME_{module_address}.png")
