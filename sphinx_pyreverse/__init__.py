@@ -27,6 +27,9 @@ def setup(app):
         "sphinx_pyreverse_only_classnames", default=None, rebuild="env"
     )
     app.add_config_value("sphinx_pyreverse_ignore", default=None, rebuild="env")
+    app.add_config_value(
+        "sphinx_pyreverse_image_max_width", default=1000, rebuild="env")
+    app.add_config_value("sphinx_pyreverse_image_scale", default=1.0, rebuild="env")
 
     # Allow override of the directive, defaulting to 'uml'
     directive_name_to_use = os.environ.get("SPHINX_PYREVERSE_DIRECTIVE", "uml")

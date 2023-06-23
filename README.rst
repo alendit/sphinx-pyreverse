@@ -47,6 +47,8 @@ To configure usage, in your conf.py
 * ``sphinx_pyreverse_module_names`` (see --module_names), default is None
 * ``sphinx_pyreverse_only_classnames`` (see --only_classnames), default is None
 * ``sphinx_pyreverse_ignore`` (see --ignore), default is None
+* ``sphinx_pyreverse_image_max_width`` (int) Rendered output max width in pixels. default is 1000
+* ``sphinx_pyreverse_image_scale`` (float) Scale the rendered output. default is 1
 
 Changing the directive
 ^^^^^^^^^^^^^^^^^^^^^^
