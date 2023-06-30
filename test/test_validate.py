@@ -201,8 +201,8 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         instance = self.gen()
         instance.run()
         instance.run()
-        # TODO: extend the subprocess mock so we can interrogate how many times pyreverse
-        # was called (should only be once)
+        # TODO: extend the subprocess mock so we can interrogate how many times
+        # pyreverse was called (should only be once)
 
     def test_invalid_flags(self):
         """test graceful handling & reporting of errors in parameters"""
