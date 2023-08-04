@@ -40,7 +40,7 @@ class DimsUnderTestGuard(object):
 
 
 def _open(_):
-    """returns a dummy image with a size paramter"""
+    """returns a dummy image with a size parameter"""
 
     class MockImage(object):
         """A MockImage with a mock size"""

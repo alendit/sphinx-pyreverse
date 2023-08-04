@@ -1,5 +1,5 @@
 """
-Defines mocks objects mimicing sphinx applications state for tests
+Defines mocks objects mimicking sphinx applications state for tests
 
 Created on 22, 2020
 
@@ -20,6 +20,8 @@ class MockConfig(object):  # pylint: disable=missing-docstring
         self.sphinx_pyreverse_module_names = None
         self.sphinx_pyreverse_only_classnames = None
         self.sphinx_pyreverse_ignore = None
+        self.sphinx_pyreverse_image_max_width = 1000
+        self.sphinx_pyreverse_image_scale = 1.0
 
 
 class MockEnv(object):  # pylint: disable=missing-docstring
