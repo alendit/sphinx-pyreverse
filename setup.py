@@ -51,7 +51,7 @@ setup(
             "isort==5.8.0",
             "pytest",
             "pytest-cov",
-            "sphinx",
+            "sphinx==4.5.0",
         ],
     },
     install_requires=[
