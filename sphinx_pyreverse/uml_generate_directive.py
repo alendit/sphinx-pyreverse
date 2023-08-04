@@ -10,6 +10,7 @@ import copy
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 from docutils import nodes
 from docutils.parsers.rst import directives
@@ -50,11 +51,11 @@ class UMLGenerateDirective(Directive):
     def _validate(self):
         """Validates that the RST parameters are valid"""
         valid_flags = {":classes:", ":packages:"}
-        unkown_arguments = set(self.arguments[1:]) - valid_flags
-        if unkown_arguments:
+        unknown_arguments = set(self.arguments[1:]) - valid_flags
+        if unknown_arguments:
             raise ValueError(
                 (
-                    f"invalid flags encountered: {unkown_arguments}. "
+                    f"invalid flags encountered: {unknown_arguments}. "
                     f"Must be one of {valid_flags}"
                 )
             )
@@ -97,15 +98,15 @@ class UMLGenerateDirective(Directive):
         doc = self.state.document
         env = doc.settings.env
         # the top-level source directory
-        base_dir = env.srcdir
+        base_dir = Path(env.srcdir).absolute()
         # the directory of the file calling the directive
-        src_dir = os.path.dirname(doc.current_source)
-        uml_dir = os.path.abspath(os.path.join(base_dir, self.DIR_NAME))
+        src_dir = Path(doc.current_source).parent.absolute()
+        uml_dir = base_dir.joinpath(self.DIR_NAME).absolute()
 
-        if not os.path.exists(uml_dir):
-            os.mkdir(uml_dir)
+        if not uml_dir.exists():
+            uml_dir.mkdir()
 
-        env.uml_dir = uml_dir
+        env.uml_dir = Path(uml_dir)
         module_name = self.arguments[0]
 
         self._validate()
@@ -152,10 +153,12 @@ class UMLGenerateDirective(Directive):
             module_name, img_name, config.sphinx_pyreverse_output
         )
         # use relpath to get sub-directory of the main 'source' location
-        src_base = os.path.relpath(base_dir, start=src_dir)
-        uri = directives.uri(os.path.join(src_base, path_from_base))
-        output_file = os.path.join(base_dir, path_from_base)
-        return (uri, output_file)
+        src_base = Path(os.path.relpath(base_dir, start=src_dir))
+        uri = directives.uri(
+            str((src_base / path_from_base).as_posix())
+        )
+        output_file = base_dir / path_from_base
+        return (Path(uri), output_file)
 
     def generate_img(self, img_name, module_name, base_dir, src_dir, config):
         """Resizes the image and returns a Sphinx image"""
@@ -173,4 +176,4 @@ class UMLGenerateDirective(Directive):
             logging.getLogger(__name__).warning(
                 "sphinx-pyreverse: No image manipulation lib found!"
             )
-        return nodes.image(uri=uri, scale=scale * 100)
+        return nodes.image(uri=str(uri), scale=scale * 100)

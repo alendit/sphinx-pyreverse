@@ -11,6 +11,7 @@ import subprocess
 import sys
 import test.mock_pil
 from io import StringIO
+from pathlib import Path
 from test.sphinx_test_util import MockState
 from unittest import mock
 
@@ -68,7 +69,7 @@ class TestUMLGenerateDirectiveBase:
             yield mocksub
 
     def gen(self):
-        """Constructs and returns a mocked UMLGenerateDirectiver instance"""
+        """Constructs and returns a mocked UMLGenerateDirective instance"""
 
         state = MockState()
 
@@ -89,7 +90,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
     """A collection of tests for the UMLGenerateDirective object"""
 
     def test_ctor(self):
-        """simply constructs a UMLGenerateDirectiver instance with mock values"""
+        """simply constructs a UMLGenerateDirective instance with mock values"""
         instance = self.gen()
         assert instance is not None
 
@@ -165,14 +166,6 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
 
         This just captures current behaviour - there should be no problem changing it.
         """
-        try:
-            FileNotFoundError  # noqa: F823
-        except NameError:
-            # In python2 we need to define this built-in, but must ignore it on
-            # python3's flake8
-            FileNotFoundError = (  # noqa: F823,E501 pylint: disable=redefined-builtin,invalid-name
-                OSError
-            )
         instance = self.gen()
         mock_dir = tmpdir / "noexist.dir"
         instance.state.document.settings.env.srcdir = mock_dir
@@ -201,8 +194,8 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         instance = self.gen()
         instance.run()
         instance.run()
-        # TODO: extend the subprocess mock so we can interegate how many times pyreverse
-        # was called (should only be once)
+        # TODO: extend the subprocess mock so we can interrogate how many times
+        # pyreverse was called (should only be once)
 
     def test_invalid_flags(self):
         """test graceful handling & reporting of errors in parameters"""
@@ -275,7 +268,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         assert config.sphinx_pyreverse_only_classnames is None
         assert config.sphinx_pyreverse_ignore is None
         assert config.sphinx_pyreverse_image_max_width == 1000
-        assert config.sphinx_pyreverse_image_scale == 1
+        assert config.sphinx_pyreverse_image_scale == 1.0
 
         # Set the config to non-default values
         config.sphinx_pyreverse_output = "dot"
@@ -289,7 +282,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         config.sphinx_pyreverse_module_names = "y"
         config.sphinx_pyreverse_ignore = "noexist.py,secondnoeexist.py"
         config.sphinx_pyreverse_image_max_width = 1500
-        config.sphinx_pyreverse_image_scale = 2
+        config.sphinx_pyreverse_image_scale = 2.0
 
         assert config.sphinx_pyreverse_output == "dot"
         assert config.sphinx_pyreverse_filter_mode == "ALL"
@@ -302,7 +295,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         assert config.sphinx_pyreverse_module_names == "y"
         assert config.sphinx_pyreverse_ignore == "noexist.py,secondnoeexist.py"
         assert config.sphinx_pyreverse_image_max_width == 1500
-        assert config.sphinx_pyreverse_image_scale == 2
+        assert config.sphinx_pyreverse_image_scale == 2.0
 
         instance._build_command(  # pylint: disable=protected-access
             "test_module", config=config
@@ -361,10 +354,10 @@ def test_module_paths(module_address):
     uri, output_file = obj.get_paths(
         img_name="IMG_NAME",
         module_name=module_address,
-        base_dir="BASE_DIR/",
-        src_dir="SRC_DIR/",
+        base_dir=Path("BASE_DIR/"),
+        src_dir=Path("SRC_DIR/"),
         config=env.config,
     )
 
-    assert uri == f"../BASE_DIR/uml_images/IMG_NAME_{module_address}.png"
-    assert output_file == f"BASE_DIR/uml_images/IMG_NAME_{module_address}.png"
+    assert uri == Path(f"../BASE_DIR/uml_images/IMG_NAME_{module_address}.png")
+    assert output_file == Path(f"BASE_DIR/uml_images/IMG_NAME_{module_address}.png")
