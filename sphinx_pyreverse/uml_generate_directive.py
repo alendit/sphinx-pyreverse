@@ -89,6 +89,8 @@ class UMLGenerateDirective(Directive):
             cmd.append("--only-classnames")
         if config.sphinx_pyreverse_ignore:
             cmd.extend(("--ignore", config.sphinx_pyreverse_ignore))
+        if config.sphinx_pyreverse_colorized:
+            cmd.append("--colorized")
 
         # finally append the module to generate the uml for
         cmd.append(module_name)

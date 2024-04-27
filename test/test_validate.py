@@ -5,6 +5,7 @@ Created on Oct 8, 2019
 
 @author: doublethefish
 """
+
 import logging
 import os
 import subprocess
@@ -269,6 +270,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         assert config.sphinx_pyreverse_ignore is None
         assert config.sphinx_pyreverse_image_max_width == 1000
         assert config.sphinx_pyreverse_image_scale == 1.0
+        assert config.sphinx_pyreverse_colorized is None
 
         # Set the config to non-default values
         config.sphinx_pyreverse_output = "dot"
@@ -283,6 +285,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         config.sphinx_pyreverse_ignore = "noexist.py,secondnoeexist.py"
         config.sphinx_pyreverse_image_max_width = 1500
         config.sphinx_pyreverse_image_scale = 2.0
+        config.sphinx_pyreverse_colorized = True
 
         assert config.sphinx_pyreverse_output == "dot"
         assert config.sphinx_pyreverse_filter_mode == "ALL"
@@ -296,6 +299,7 @@ class TestUMLGenerateDirective(TestUMLGenerateDirectiveBase):
         assert config.sphinx_pyreverse_ignore == "noexist.py,secondnoeexist.py"
         assert config.sphinx_pyreverse_image_max_width == 1500
         assert config.sphinx_pyreverse_image_scale == 2.0
+        assert config.sphinx_pyreverse_colorized
 
         instance._build_command(  # pylint: disable=protected-access
             "test_module", config=config
