@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
+set -o pipefail
+set -e
 
 while getopts u:p:rh option
 do
 case "${option}"
 in
-u) export TWINE_USERNAME=${OPTARG};;
-p) export TWINE_PASSWORD=${OPTARG};;
 r) DO_RELEASE=1;;
 h) printf " [-u <username>] [-p <password>] [-r ]\n"
-   printf "  -u: Overrides env.TWINE_USERNAME (one of must be set)"
-   printf "  -p: Overrides env.TWINE_PASSWORD (one of must be set)"
-   printf "  -r: Releases to the master repository"
+   printf "  -r: Releases to the master repository\n"
+   printf "  uses the .pypirc config"
    ;;
 *) exit 3;; # unknown options
 esac
@@ -18,11 +17,6 @@ done
 
 if [ ! -d sphinx_pyreverse ]; then
 	printf "sphinx_pyreverse: Please rerun in the sphinx_pyreverse module's parent dir\\n"
-	exit 3
-fi
-
-if [ -z "$TWINE_PASSWORD" ] || [ -z "$TWINE_USERNAME" ]; then
-	printf "sphinx-pyreverse: Please set TWINE_USERNAME and TWINE_PASSWORD env variables\\n"
 	exit 3
 fi
 
@@ -55,7 +49,7 @@ fi
 
 python3 setup.py sdist bdist_wheel | sed 's/^/py3: /'
 
-python3 -m twine upload --verbose --repository-url "$PIP_REPOSITORY" dist/* | sed 's/^/upload: /'
+python3 -m twine upload --verbose --repository sphinx-pyreverse dist/* | sed 's/^/upload: /'
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ]; then
 	printf "sphinx_pyreverse: Failed to upload dist/*, files may already have been uploaded\\n"
